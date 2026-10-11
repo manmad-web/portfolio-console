@@ -1,0 +1,378 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Manish Madishetty Portfolio</title>
+  <meta name="description" content="Manish Madishetty: computer science at SFU, building AI agents, evaluations and red-teaming tools. Experience, research, awards and leadership.">
+  <meta name="author" content="Manish Madishetty">
+  <meta name="theme-color" content="#111113">
+  <meta property="og:title" content="Manish Madishetty Portfolio">
+  <meta property="og:description" content="An interactive portfolio console: press a key to explore experience, research, awards and builds.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="docs/preview.jpg">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect x='6' y='10' width='52' height='44' rx='10' fill='%23AD4017'/%3E%3Crect x='10' y='8' width='44' height='38' rx='9' fill='%23EC6426'/%3E%3Ctext x='32' y='37' font-family='Arial' font-weight='900' font-size='26' text-anchor='middle' fill='%2366271B'%3EM%3C/text%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap">
+  <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <a class="mark" href="#top" aria-label="manish, home">manish<span>.</span></a>
+    <nav class="main" aria-label="Sections">
+      <button type="button" data-open="experience">Experience</button>
+      <button type="button" data-open="research">Research</button>
+      <button type="button" data-open="awards">Awards</button>
+      <button type="button" data-open="builds">Builds</button>
+      <button type="button" data-open="about">About</button>
+    </nav>
+    <a class="talk" href="#contact" data-contact>Let's Talk</a>
+  </header>
+
+  <main id="top">
+    <section class="intro" aria-labelledby="hello">
+      <span class="avail"><i aria-hidden="true"></i>Now: AI Analyst Co-op, Government of BC</span>
+      <h1 id="hello">Hi, I'm <button type="button" class="name-btn" id="name-btn" aria-label="Edit display name, currently Manish">Manish</button></h1>
+      <p>A computer science student at SFU building AI agents, evals and red-teaming tools that are safe, grounded and useful.</p>
+    </section>
+
+    <!-- The console. Everything inside shares one 1536×1024 coordinate system. -->
+    <div class="device" id="device" role="group" aria-label="Portfolio console. Each key opens a section.">
+      <svg class="case" viewBox="0 0 1536 1024" aria-hidden="true" focusable="false">
+        <defs>
+          <!-- slab outlines (extruded by console.js) -->
+          <rect id="lid-shape"  x="-556" y="-160" width="1112" height="320" rx="78"/>
+          <rect id="base-shape" x="-618" y="-214" width="1236" height="428" rx="70"/>
+
+          <linearGradient id="g-metal" x1="0" y1="0" x2=".35" y2="1">
+            <stop offset="0" stop-color="#5a5b62"/><stop offset=".18" stop-color="#3f4046"/>
+            <stop offset=".55" stop-color="#2d2e33"/><stop offset="1" stop-color="#1f2024"/>
+          </linearGradient>
+          <linearGradient id="g-bevel" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#a3a4ab" stop-opacity=".9"/><stop offset=".25" stop-color="#6b6c73" stop-opacity=".25"/>
+            <stop offset=".75" stop-color="#000" stop-opacity=".1"/><stop offset="1" stop-color="#000" stop-opacity=".6"/>
+          </linearGradient>
+          <linearGradient id="g-sheen" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".3" stop-color="#fff" stop-opacity=".06"/>
+            <stop offset=".42" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#fff" stop-opacity="0"/>
+          </linearGradient>
+          <linearGradient id="g-bezel" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#0a0a0b"/><stop offset=".7" stop-color="#1a1b1e"/><stop offset="1" stop-color="#3a3b41"/>
+          </linearGradient>
+          <linearGradient id="g-glass" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#0d0d10"/><stop offset=".6" stop-color="#050506"/><stop offset="1" stop-color="#0e0e12"/>
+          </linearGradient>
+          <linearGradient id="g-tray" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#050506"/><stop offset=".35" stop-color="#0d0d0f"/><stop offset="1" stop-color="#18191c"/>
+          </linearGradient>
+          <linearGradient id="g-tray-rim" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#121214"/><stop offset=".6" stop-color="#2a2b30"/><stop offset="1" stop-color="#76777e"/>
+          </linearGradient>
+          <linearGradient id="g-coil" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#5a1d05"/><stop offset=".22" stop-color="#c4541c"/><stop offset=".42" stop-color="#ffb684"/>
+            <stop offset=".58" stop-color="#EC6426"/><stop offset="1" stop-color="#5e2006"/>
+          </linearGradient>
+          <radialGradient id="g-screw" cx=".38" cy=".32" r=".75">
+            <stop offset="0" stop-color="#c4c5cb"/><stop offset=".45" stop-color="#6d6e74"/><stop offset="1" stop-color="#25262a"/>
+          </radialGradient>
+          <filter id="f-soft" x="-20%" y="-50%" width="140%" height="200%"><feGaussianBlur stdDeviation="22"/></filter>
+
+          <!-- countersunk hex screw -->
+          <g id="screw">
+            <circle r="15" fill="#0b0b0d"/>
+            <circle r="15" fill="none" stroke="#5d5e64" stroke-width="1.5" stroke-dasharray="30 70" transform="rotate(30)" opacity=".7"/>
+            <circle r="11" fill="url(#g-screw)"/>
+            <polygon points="5,0 2.5,4.3 -2.5,4.3 -5,0 -2.5,-4.3 2.5,-4.3" fill="#141416"/>
+          </g>
+        </defs>
+
+        <!-- floor shadow -->
+        <ellipse cx="740" cy="925" rx="680" ry="52" fill="#000" opacity=".7" filter="url(#f-soft)"/>
+
+        <!-- LID -->
+        <g transform="translate(772 262) rotate(-3) skewX(5)">
+          <g id="lid-side"></g>
+          <use href="#lid-shape" fill="url(#g-metal)"/>
+          <use href="#lid-shape" fill="url(#g-sheen)"/>
+          <rect x="-552" y="-156" width="1104" height="312" rx="74" fill="none" stroke="url(#g-bevel)" stroke-width="5"/>
+          <!-- screen recess -->
+          <rect x="-494" y="-122" width="988" height="236" rx="46" fill="url(#g-bezel)"/>
+          <rect x="-482" y="-112" width="964" height="216" rx="38" fill="#09090a"/>
+          <rect x="-468" y="-102" width="936" height="196" rx="28" fill="url(#g-glass)"/>
+          <rect x="-468" y="-102" width="936" height="196" rx="28" fill="none" stroke="#000" stroke-width="6" opacity=".8"/>
+          <path d="M-440 -102 L-250 -102 L-420 94 L-468 94 L-468 -70 Z" fill="#fff" opacity=".035"/>
+          <path d="M160 -102 L215 -102 L60 94 L5 94 Z" fill="#fff" opacity=".02"/>
+          <use href="#screw" x="-520" y="-124"/><use href="#screw" x="520" y="-124"/>
+          <use href="#screw" x="-520" y="124"/><use href="#screw" x="520" y="124"/>
+        </g>
+
+        <!-- COIL HINGE -->
+        <g transform="translate(770 440) rotate(-3.1)">
+          <rect x="-104" y="-34" width="208" height="68" rx="16" fill="#060607"/>
+          <rect x="-104" y="-34" width="208" height="68" rx="16" fill="none" stroke="#45464c" stroke-width="2" opacity=".5"/>
+          <rect x="-86" y="-23" width="172" height="46" rx="21" fill="url(#g-coil)"/>
+          <g id="coil-rings"></g>
+          <rect x="-86" y="-23" width="172" height="46" rx="21" fill="none" stroke="#2a0c02" stroke-width="2"/>
+        </g>
+
+        <!-- BASE -->
+        <g transform="translate(768 665) rotate(-3.2) skewX(4.8)">
+          <g id="base-side"></g>
+          <use href="#base-shape" fill="url(#g-metal)"/>
+          <use href="#base-shape" fill="url(#g-sheen)"/>
+          <rect x="-614" y="-210" width="1228" height="420" rx="66" fill="none" stroke="url(#g-bevel)" stroke-width="5"/>
+          <g id="trays"></g>
+          <use href="#screw" x="-584" y="-182"/><use href="#screw" x="584" y="-182"/>
+          <use href="#screw" x="-584" y="182"/><use href="#screw" x="584" y="182"/>
+          <use href="#screw" x="-596" y="0"/><use href="#screw" x="596" y="0"/>
+          <text x="-540" y="198" fill="#606168" font-family="Courier New, monospace" font-size="14" font-weight="700" letter-spacing="3">MM-11 / CAREER INDEX</text>
+        </g>
+
+        <!-- switch wells (generated from the keymap) -->
+        <g id="wells"></g>
+      </svg>
+
+      <div class="screen" id="screen">
+        <div class="scr-meta" aria-hidden="true"><span id="scr-owner">MANISH / CAREER INDEX</span><span class="st" id="scr-status">READY</span></div>
+        <h2 class="scr-title" id="scr-title" aria-label="Manish's portfolio"><span id="scr-text" aria-hidden="true"></span><span class="caret" aria-hidden="true"></span></h2>
+        <p class="scr-desc" id="scr-desc">CS at SFU. AI agents, evals and red-teaming.</p>
+      </div>
+      <!-- keycaps are generated by assets/js/console.js -->
+    </div>
+
+    <div class="strip" aria-label="Highlights">
+      <div class="strip-track">
+        <ul>
+          <li><span><b>1st Place</b> Chang Institute Catalyst Challenge</span></li>
+          <li><span><b>95%</b> accuracy on 1,089 audit cases</span></li>
+          <li><span><b>17,800+</b> accounting standards grounded</span></li>
+          <li><span><b>44</b> behavioral metrics in GovernAI</span></li>
+          <li><span><b>People's Choice</b> UI/UX for AskSFU</span></li>
+          <li><span><b>CSC · BMC · CSM</b> certified</span></li>
+        </ul>
+        <ul aria-hidden="true">
+          <li><span><b>1st Place</b> Chang Institute Catalyst Challenge</span></li>
+          <li><span><b>95%</b> accuracy on 1,089 audit cases</span></li>
+          <li><span><b>17,800+</b> accounting standards grounded</span></li>
+          <li><span><b>44</b> behavioral metrics in GovernAI</span></li>
+          <li><span><b>People's Choice</b> UI/UX for AskSFU</span></li>
+          <li><span><b>CSC · BMC · CSM</b> certified</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <section class="contact" id="contact" aria-labelledby="contact-h">
+      <h2 id="contact-h" tabindex="-1">Good work starts with <em>hello.</em></h2>
+      <p>Hiring for a co-op or new-grad role, building something with AI, or want to talk startups? I'd like to hear from you.</p>
+      <div class="email" id="email">mma310@sfu.ca</div>
+      <div class="contact-row">
+        <button type="button" class="pill primary" id="copy-email">Copy email</button>
+        <a class="pill" href="mailto:mma310@sfu.ca">Open in mail app</a>
+        <a class="pill" href="https://www.linkedin.com/in/manishmadishetty" target="_blank" rel="noopener">LinkedIn ↗</a>
+      </div>
+      <div class="copied" id="copied" role="status"></div>
+    </section>
+  </main>
+
+  <footer>
+    <span>Manish Madishetty · Vancouver, Canada</span>
+    <span>Built as a portfolio console. Press any key.</span>
+  </footer>
+</div>
+
+<dialog id="panel" aria-labelledby="panel-title">
+  <div class="sheet">
+    <div class="sheet-head">
+      <div>
+        <div class="eyebrow" id="panel-eyebrow"></div>
+        <h2 id="panel-title"></h2>
+      </div>
+      <button type="button" class="close" id="panel-close">Close</button>
+    </div>
+    <div class="sheet-body" id="panel-body"></div>
+  </div>
+</dialog>
+
+<!-- ======================================================================
+     Section content. Edit these templates to update the portfolio.
+     ====================================================================== -->
+<template id="t-experience">
+    <p class="lede">Industry roles in applied AI, from governance tooling to red-teaming production LLMs.</p>
+    <article class="entry">
+      <div class="entry-top"><h3>AI Analyst Co-op</h3><span class="when">Sept 2026 – Jan 2027</span></div>
+      <div class="where">Ministry of Citizens' Services, Connected Services BC · Remote, Canada</div>
+      <ul>
+        <li>Building a PyRIT-based red-teaming and evaluation service for a multi-agent RAG system, containerized with Docker for deployment on BC Gov's OpenShift platform.</li>
+        <li>Designed and ran single- and multi-turn adversarial attacks, including Crescendo and TAP, against production LLM targets using PyRIT orchestrators.</li>
+        <li>Built LLM-as-judge scorers to evaluate safety and correctness, and mapped AI harms to regulatory frameworks.</li>
+      </ul>
+      <div class="tags"><span class="tag">PyRIT</span><span class="tag">Docker</span><span class="tag">OpenShift</span><span class="tag">LLM-as-judge</span></div>
+    </article>
+    <article class="entry">
+      <div class="entry-top"><h3>AI Engineer Intern</h3><span class="when">May 2025 – Nov 2025</span></div>
+      <div class="where">TechVest Global · Toronto, Canada</div>
+      <ul>
+        <li>Developed GovernAI, a multi-agent AI output evaluation platform, across the backend pipeline and governance dashboard. Outputs were scored on 44 behavioral metrics spanning bias and explainability, with PII detection and human oversight routing.</li>
+        <li>Researched and integrated open-source evaluation tools into a modular governance pipeline, mapping outputs to EU AI Act, NIST AI RMF and ISO 42001 controls.</li>
+      </ul>
+      <div class="tags"><span class="tag">Multi-agent</span><span class="tag">AI governance</span><span class="tag">EU AI Act</span><span class="tag">NIST AI RMF</span></div>
+    </article>
+</template>
+
+<template id="t-research">
+    <p class="lede">Research on grounded AI agents and model robustness.</p>
+    <article class="entry">
+      <div class="entry-top"><h3>Undergraduate Researcher</h3><span class="when">May 2026 – Present</span></div>
+      <div class="where">Simon Fraser University · Supervisor: Prof. Mohammad Tayebi</div>
+      <ul>
+        <li>Building an AI agent that reviews real company financial statements, catches errors and cites the exact accounting rule broken, combining exact math checks with an LLM reranker that selects the correct standard.</li>
+        <li>Engineered a grounding tool across 17,800+ official accounting standards to eliminate rule hallucinations; reached 95% accuracy on flagged errors across a 1,089-case test set from public filings.</li>
+      </ul>
+      <div class="tags"><span class="tag">Agents</span><span class="tag">Retrieval</span><span class="tag">Reranking</span><span class="tag">Financial reporting</span></div>
+    </article>
+    <article class="entry">
+      <div class="entry-top"><h3>Research Assistant</h3><span class="when">Jan 2026 – Apr 2026</span></div>
+      <div class="where">Fairleigh Dickinson University · Supervisor: Dr. Anitha Saravana · Vancouver</div>
+      <ul>
+        <li>Developed LSTM-based predictive models in PyTorch to analyze image data and evaluate model robustness.</li>
+        <li>Implemented a CNN + LSTM architecture for image sequences and evaluated accuracy under clean and adversarial conditions.</li>
+      </ul>
+      <div class="tags"><span class="tag">PyTorch</span><span class="tag">CNN + LSTM</span><span class="tag">Adversarial robustness</span></div>
+    </article>
+</template>
+
+<template id="t-awards">
+    <p class="lede">Competition wins from SFU's entrepreneurship and applied sciences programs.</p>
+    <article class="entry">
+      <span class="badge gold">1st Place</span>
+      <div class="entry-top"><h3>Chang Institute Catalyst Challenge</h3><span class="when">Aug 2025 – Nov 2025</span></div>
+      <div class="where">SFU Charles Chang Institute for Entrepreneurship</div>
+      <ul>
+        <li>Designed and prototyped Moment Intelligence, an AI-powered React supplier discovery dashboard for Moment Energy with supplier scoring cards, component and region filters, and a real-time trade intelligence feed.</li>
+        <li>Designed the vendor database schema and a multi-agent RAG pipeline with LangChain and n8n to crawl, vectorize and retrieve supplier profiles, compliance records and product specs.</li>
+        <li>Pitched directly to Moment Energy's CEO and COO; both expressed interest in enterprise deployment.</li>
+      </ul>
+    </article>
+    <article class="entry">
+      <span class="badge pink">People's Choice</span>
+      <div class="entry-top"><h3>UI/UX People's Choice Award, AskSFU</h3><span class="when">Sept 2025</span></div>
+      <div class="where">SFU Faculty of Applied Sciences</div>
+      <ul>
+        <li>Engineered and productized SFU's first AI-powered student support chatbot with Python, LangChain and GPT-4; compared vector RAG and GraphRAG configurations and deployed to end users.</li>
+        <li>Designed responsive, accessible UI components; featured on the Faculty of Applied Sciences Computing Showcase website.</li>
+      </ul>
+    </article>
+    <article class="entry">
+      <span class="badge">2nd Runner-up</span>
+      <div class="entry-top"><h3>Chang Institute Top Idea Prize, ZENJI</h3><span class="when">April 2026</span></div>
+      <div class="where">SFU Charles Chang Institute for Entrepreneurship</div>
+      <ul>
+        <li>Placed in a university-wide venture competition for ZENJI, a zero-sugar fermented gut-health beverage that upcycles imperfect produce, validated through market sizing, unit economics and competitive positioning in functional drinks.</li>
+      </ul>
+    </article>
+</template>
+
+<template id="t-builds">
+    <p class="lede">Things I've designed and shipped, from research agents to competition prototypes.</p>
+    <article class="entry">
+      <div class="entry-top"><h3>Financial statement audit agent</h3><span class="when">2026 · Research</span></div>
+      <ul><li>Flags errors in real company financial statements and cites the exact accounting rule broken. Grounded in 17,800+ standards; 95% accuracy on 1,089 cases.</li></ul>
+      <div class="tags"><span class="tag">Python</span><span class="tag">LLM reranker</span><span class="tag">Grounding</span></div>
+    </article>
+    <article class="entry">
+      <div class="entry-top"><h3>Red-teaming &amp; evaluation service</h3><span class="when">2026 · BC Gov</span></div>
+      <ul><li>Adversarial testing of a multi-agent RAG system with Crescendo and TAP attacks, scored by LLM-as-judge evaluators.</li></ul>
+      <div class="tags"><span class="tag">PyRIT</span><span class="tag">Docker</span><span class="tag">OpenShift</span></div>
+    </article>
+    <article class="entry">
+      <div class="entry-top"><h3>Moment Intelligence</h3><span class="when">2025 · 1st Place</span></div>
+      <ul><li>Supplier discovery dashboard with scoring cards, filters and a live trade feed, backed by a multi-agent RAG pipeline.</li></ul>
+      <div class="tags"><span class="tag">React</span><span class="tag">LangChain</span><span class="tag">n8n</span><span class="tag">RAG</span></div>
+    </article>
+    <article class="entry">
+      <div class="entry-top"><h3>AskSFU</h3><span class="when">2025 · People's Choice</span></div>
+      <ul><li>SFU's first AI-powered student support chatbot, with experiments comparing vector RAG and GraphRAG.</li></ul>
+      <div class="tags"><span class="tag">Python</span><span class="tag">LangChain</span><span class="tag">GPT-4</span><span class="tag">GraphRAG</span></div>
+    </article>
+    <article class="entry">
+      <div class="entry-top"><h3>GovernAI</h3><span class="when">2025 · TechVest Global</span></div>
+      <ul><li>Multi-agent AI output evaluation platform scoring 44 behavioral metrics, with PII detection and human oversight routing.</li></ul>
+      <div class="tags"><span class="tag">Multi-agent</span><span class="tag">Evaluation</span><span class="tag">Dashboard</span></div>
+    </article>
+</template>
+
+<template id="t-stack">
+    <p class="lede">The tools I reach for, grouped by where they sit in a build.</p>
+    <div class="skill-grid">
+      <div><h3>Languages</h3><div class="tags"><span class="tag">Python</span><span class="tag">SQL</span><span class="tag">C++</span></div></div>
+      <div><h3>AI / ML</h3><div class="tags"><span class="tag">PyTorch</span><span class="tag">scikit-learn</span><span class="tag">LangChain</span><span class="tag">LangGraph</span><span class="tag">AutoGen</span><span class="tag">CrewAI</span><span class="tag">PyRIT</span><span class="tag">RAG pipelines</span></div></div>
+      <div><h3>Web development</h3><div class="tags"><span class="tag">React</span><span class="tag">Node.js</span><span class="tag">Tailwind CSS</span><span class="tag">HTML/CSS</span><span class="tag">REST APIs</span></div></div>
+      <div><h3>Infrastructure &amp; DevOps</h3><div class="tags"><span class="tag">Azure</span><span class="tag">Docker</span><span class="tag">OpenShift</span><span class="tag">AWS (S3, EC2)</span><span class="tag">PostgreSQL</span><span class="tag">pgvector</span><span class="tag">FastAPI</span><span class="tag">Git / CI/CD</span></div></div>
+      <div><h3>AI-assisted development</h3><div class="tags"><span class="tag">Claude Code</span><span class="tag">Cursor</span><span class="tag">Windsurf</span><span class="tag">Mem0</span><span class="tag">n8n</span><span class="tag">Base44</span><span class="tag">Emergent</span><span class="tag">Google Stitch</span></div></div>
+    </div>
+</template>
+
+<template id="t-about">
+    <p class="lede">I study computer science with a statistics minor at Simon Fraser University. Most of my work sits where AI meets accountability: agents that cite their sources, evaluations that catch harm before users do, and products people actually want to use. I also like the business side, from venture competitions to securities and markets.</p>
+    <article class="entry">
+      <div class="entry-top"><h3>Simon Fraser University</h3><span class="when">May 2023 – Dec 2027</span></div>
+      <div class="where">Bachelor of Applied Science · Computer Science Major, Statistics Minor · Vancouver, Canada</div>
+    </article>
+    <article class="entry">
+      <div class="entry-top"><h3>Based in</h3><span class="when">Vancouver, BC</span></div>
+      <div class="where">Open to remote and hybrid roles across Canada.</div>
+    </article>
+</template>
+
+<template id="t-leadership">
+    <p class="lede">Student government, mentoring and campus roles at SFU.</p>
+    <article class="entry">
+      <div class="entry-top"><h3>Associate Vice President</h3><span class="when">Jan 2025 – May 2025</span></div>
+      <div class="where">Simon Fraser Student Society (SFSS) · Vancouver, Canada</div>
+      <ul><li>Owned product vision for the SFSS mobile app, defining technical requirements and data integration architecture to consolidate clubs, events, room booking and news into a single platform.</li></ul>
+    </article>
+    <article class="entry">
+      <div class="entry-top"><h3>Faculty of Applied Sciences Ambassador</h3></div>
+      <div class="where">SFU Faculty of Applied Sciences</div>
+    </article>
+    <article class="entry">
+      <div class="entry-top"><h3>Calculus Peer Mentor</h3></div>
+      <div class="where">Simon Fraser University</div>
+    </article>
+    <article class="entry">
+      <div class="entry-top"><h3>Financial Literacy Mentor</h3></div>
+      <div class="where">PennyDrops Club</div>
+    </article>
+</template>
+
+<template id="t-certs">
+    <p class="lede">Credentials in finance, markets and agile delivery.</p>
+    <div class="certs">
+      <div class="cert"><b>CSC</b><span>Canadian Securities Course</span><small>Canadian Securities Institute</small></div>
+      <div class="cert"><b>BMC</b><span>Bloomberg Market Concepts</span><small>Bloomberg</small></div>
+      <div class="cert"><b>CSM</b><span>Certified ScrumMaster</span><small>Scrum Alliance</small></div>
+    </div>
+</template>
+
+<template id="t-timeline">
+    <p class="lede">Everything from the last few years, newest first.</p>
+    <ol class="tl">
+      <li><span class="when">Sept 2026 – Jan 2027</span><div><b>AI Analyst Co-op</b><span>Connected Services BC, Ministry of Citizens' Services</span></div></li>
+      <li><span class="when">May 2026 – Present</span><div><b>Undergraduate Researcher</b><span>SFU, with Prof. Mohammad Tayebi</span></div></li>
+      <li><span class="when">April 2026</span><div><b>Second Runner-up, Top Idea Prize</b><span>ZENJI · SFU Charles Chang Institute</span></div></li>
+      <li><span class="when">Jan – Apr 2026</span><div><b>Research Assistant</b><span>Fairleigh Dickinson University, with Dr. Anitha Saravana</span></div></li>
+      <li><span class="when">Sept 2025</span><div><b>UI/UX People's Choice Award</b><span>AskSFU · SFU Faculty of Applied Sciences</span></div></li>
+      <li><span class="when">Aug – Nov 2025</span><div><b>1st Place, Catalyst Challenge</b><span>Moment Intelligence · SFU Charles Chang Institute</span></div></li>
+      <li><span class="when">May – Nov 2025</span><div><b>AI Engineer Intern</b><span>TechVest Global, Toronto</span></div></li>
+      <li><span class="when">Jan – May 2025</span><div><b>Associate Vice President</b><span>Simon Fraser Student Society</span></div></li>
+      <li><span class="when">May 2023</span><div><b>Started at SFU</b><span>BASc Computer Science, Statistics Minor (expected Dec 2027)</span></div></li>
+    </ol>
+</template>
+
+
+<script src="assets/js/keymap.js"></script>
+<script src="assets/js/console.js"></script>
+</body>
+</html>
