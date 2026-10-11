@@ -2,7 +2,9 @@
 
 **The personal portfolio of Manish Madishetty**, built as a retro-futurist mechanical keyboard console. The keycaps spell **P-O-R-T-F-O-L-I-O**. Press one and it opens a section of my work: industry experience, research, competition wins, featured builds, leadership and certifications.
 
-![Portfolio Console preview](docs/preview.jpg)
+**Live site: [manmad-web.github.io/portfolio-console](https://manmad-web.github.io/portfolio-console/)**
+
+[![Portfolio Console preview](docs/preview.jpg)](https://manmad-web.github.io/portfolio-console/)
 
 > Computer Science (Statistics minor) at Simon Fraser University · AI Analyst Co-op at the Government of BC · building AI agents, evaluations and red-teaming tools that are safe, grounded and useful.
 
@@ -79,11 +81,9 @@ Then open <http://localhost:8000>. You can also open `index.html` directly in a 
 
 ## Deploy to GitHub Pages
 
-1. Open the repository on GitHub and go to **Settings → Pages**.
-2. Under **Build and deployment**, choose **Deploy from a branch**.
-3. Select the `main` branch and the `/ (root)` folder, then save.
+This repo is already published with GitHub Pages from the `main` branch root, at <https://manmad-web.github.io/portfolio-console/>. Every push to `main` redeploys it automatically within about a minute.
 
-The site goes live at `https://<your-username>.github.io/portfolio-console/` within a minute or two. Netlify, Vercel and Cloudflare Pages also work as-is: point them at the repository root with no build command.
+To publish a fork, go to **Settings → Pages**, choose **Deploy from a branch**, then pick `main` and `/ (root)`. Netlify, Vercel and Cloudflare Pages also work as-is: point them at the repository root with no build command.
 
 ## Editing content
 
