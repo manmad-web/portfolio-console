@@ -193,6 +193,10 @@ dialog::backdrop { background: rgba(6,6,8,.72); backdrop-filter: blur(3px); }
 .badge { font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; padding: 3px 9px; border-radius: 6px; background: rgba(236,100,38,.14); color: var(--orange); justify-self: start; }
 .badge.gold { background: rgba(248,169,31,.14); color: var(--amber); }
 .badge.pink { background: rgba(228,165,202,.14); color: var(--pink); }
+.about { display: grid; gap: 16px; padding-top: 14px; }
+.about p { margin: 0; color: #cfc9c4; max-width: 66ch; }
+.about .contact-row { justify-content: flex-start; margin-top: 4px; }
+footer a:hover { color: var(--cream); }
 .skill-grid { display: grid; gap: 18px; margin-top: 16px; }
 .skill-grid h3 { margin: 0 0 8px; font-size: 13px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); font-weight: 700; }
 .certs { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-top: 16px; }
