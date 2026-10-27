@@ -40,8 +40,8 @@
 | **P** | Experience | AI Analyst Co-op (Connected Services BC) · AI Engineer Intern (TechVest Global) |
 | **O** | Research | Undergraduate Researcher, SFU · Research Assistant, Fairleigh Dickinson University |
 | **R** | Awards | 1st Place Catalyst Challenge · UI/UX People's Choice (AskSFU) · Second Runner-up Top Idea Prize (ZENJI) |
-| **T** | Tech stack | Languages, AI/ML, web, infrastructure and AI-assisted development tools |
-| **F** | Featured builds | Financial statement audit agent · PyRIT red-teaming service · Moment Intelligence · AskSFU · GovernAI |
+| **T** | Tech stack | Everything I've used: languages, AI/ML, web, data and infrastructure, AI-assisted dev, product and design |
+| **F** | Projects | All projects once each: IntelliAudit · SignShield · audit agent · red-teaming service · GovernAI · AskSFU · Moment Intelligence · SFSS Nexus · ZENJI · Rate CS Staff · this site |
 | **O** | About me | Education at SFU and a short bio |
 | **L** | Leadership | SFSS Associate VP · FAS Ambassador · Calculus Peer Mentor · PennyDrops Financial Literacy Mentor |
 | **I** | Certified | Canadian Securities Course · Bloomberg Market Concepts · Certified ScrumMaster |

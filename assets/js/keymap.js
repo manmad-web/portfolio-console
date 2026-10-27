@@ -23,8 +23,8 @@ window.PORTFOLIO_KEYS = [
     title: 'Competition wins',     desc: "1st place, People's Choice and a Top Idea podium." },
   { ltr: 'T', lbl: 'Tech stack',      x: 982,  y: 559, w: 156, h: 130, c: '#2E573A', b: '#193A23', ink: '#FDE3CF', open: 'stack',
     title: 'What I build with',    desc: 'Python, PyTorch, LangGraph, PyRIT, React, Docker.' },
-  { ltr: 'F', lbl: 'Featured builds', x: 1184, y: 548, w: 156, h: 130, c: '#72AC43', b: '#487A26', ink: '#66271B', open: 'builds',
-    title: "Things I've built",    desc: 'Agents, eval platforms, dashboards and chatbots.' },
+  { ltr: 'F', lbl: 'Projects', x: 1184, y: 548, w: 156, h: 130, c: '#72AC43', b: '#487A26', ink: '#66271B', open: 'builds',
+    title: 'See my projects',      desc: 'Safety research, AI products, apps and competition wins.' },
 
   // ---- Lower row: O L I O ★ + LET'S TALK ----
   { ltr: 'O', lbl: 'About me',        x: 355,  y: 783, w: 98,  h: 108, c: '#E4A5CA', b: '#B76F9B', ink: '#66271B', open: 'about',
@@ -47,7 +47,7 @@ window.PORTFOLIO_SECTIONS = {
   research:   { t: 't-research',   h: 'Research' },
   awards:     { t: 't-awards',     h: 'Competition wins' },
   stack:      { t: 't-stack',      h: 'Tech stack' },
-  builds:     { t: 't-builds',     h: 'Featured builds' },
+  builds:     { t: 't-builds',     h: 'Projects' },
   about:      { t: 't-about',      h: 'About me' },
   leadership: { t: 't-leadership', h: 'Clubs & campus' },
   certs:      { t: 't-certs',      h: 'Certifications' },

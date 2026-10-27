@@ -27,7 +27,7 @@
       <button type="button" data-open="experience">Experience</button>
       <button type="button" data-open="research">Research</button>
       <button type="button" data-open="awards">Awards</button>
-      <button type="button" data-open="builds">Builds</button>
+      <button type="button" data-open="builds">Projects</button>
       <button type="button" data-open="about">About</button>
     </nav>
     <a class="talk" href="#contact" data-contact>Let's Talk</a>
@@ -277,43 +277,113 @@
 </template>
 
 <template id="t-builds">
-    <p class="lede">Things I've designed and shipped, from research agents to competition prototypes.</p>
-    <article class="entry">
-      <div class="entry-top"><h3>Financial statement audit agent</h3><span class="when">2026 · Research</span></div>
-      <ul><li>Flags errors in real company financial statements and cites the exact accounting rule broken. Grounded in 17,800+ standards; 95% accuracy on 1,089 cases.</li></ul>
-      <div class="tags"><span class="tag">Python</span><span class="tag">LLM reranker</span><span class="tag">Grounding</span></div>
-    </article>
-    <article class="entry">
-      <div class="entry-top"><h3>Red-teaming &amp; evaluation service</h3><span class="when">2026 · BC Gov</span></div>
-      <ul><li>Adversarial testing of a multi-agent RAG system with Crescendo and TAP attacks, scored by LLM-as-judge evaluators.</li></ul>
-      <div class="tags"><span class="tag">PyRIT</span><span class="tag">Docker</span><span class="tag">OpenShift</span></div>
-    </article>
-    <article class="entry">
-      <div class="entry-top"><h3>Moment Intelligence</h3><span class="when">2025 · 1st Place</span></div>
-      <ul><li>Supplier discovery dashboard with scoring cards, filters and a live trade feed, backed by a multi-agent RAG pipeline.</li></ul>
-      <div class="tags"><span class="tag">React</span><span class="tag">LangChain</span><span class="tag">n8n</span><span class="tag">RAG</span></div>
-    </article>
-    <article class="entry">
-      <div class="entry-top"><h3>AskSFU</h3><span class="when">2025 · People's Choice</span></div>
-      <ul><li>SFU's first AI-powered student support chatbot, with experiments comparing vector RAG and GraphRAG.</li></ul>
-      <div class="tags"><span class="tag">Python</span><span class="tag">LangChain</span><span class="tag">GPT-4</span><span class="tag">GraphRAG</span></div>
-    </article>
-    <article class="entry">
-      <div class="entry-top"><h3>GovernAI</h3><span class="when">2025 · TechVest Global</span></div>
-      <ul><li>Multi-agent AI output evaluation platform scoring 44 behavioral metrics, with PII detection and human oversight routing.</li></ul>
-      <div class="tags"><span class="tag">Multi-agent</span><span class="tag">Evaluation</span><span class="tag">Dashboard</span></div>
-    </article>
+  <div class="about">
+    <p>I build AI systems that are grounded, tested and accountable, and I like shipping them as products people can use. These are the projects I've worked on, newest first, from research benchmarks and safety tooling to student apps and competition pitches. Each one is listed once, with its repos linked.</p>
+    <div class="contact-row">
+      <a class="pill" href="https://github.com/manmad-web" target="_blank" rel="noopener">All repos on GitHub &#8599;</a>
+      <a class="pill" href="https://www.linkedin.com/in/manishmadishetty" target="_blank" rel="noopener">LinkedIn &#8599;</a>
+    </div>
+  </div>
+
+  <h3 class="group">AI safety &amp; research</h3>
+  <article class="entry">
+    <div class="entry-top"><h3>IntelliAudit</h3><span class="when">2026 · Research</span></div>
+    <div class="where">Benchmark for LLM financial auditing</div>
+    <ul>
+      <li>A standards-citation benchmark that scores whether a system can name the governing ASC codification reference for a financial-statement violation, using real 10-K data and deterministic, cross-checkable ground truth.</li>
+      <li>The pipeline ingests real SEC EDGAR facts, builds reconciling balance sheets and injects violations, so values are never fabricated.</li>
+    </ul>
+    <div class="tags"><span class="tag">Python</span><span class="tag">SEC EDGAR</span><span class="tag">XBRL</span><span class="tag">LLM evaluation</span></div>
+    <div class="plinks"><a href="https://github.com/manmad-web/IntelliAudit" target="_blank" rel="noopener">GitHub &#8599;</a></div>
+  </article>
+  <article class="entry">
+    <div class="entry-top"><h3>SignShield</h3><span class="when">Spring 2026 · CMPT 310</span></div>
+    <div class="where">With Adam Silver and Manav Juthani · SFU School of Computing Science</div>
+    <ul>
+      <li>A temporal defense against adversarial traffic-sign attacks. ResNet-18 extracts features from each of 8 frames, and an LSTM with temporal attention learns which frames to trust without being told which were attacked.</li>
+      <li>With 6 of 8 frames corrupted, it held 98.4% accuracy against 67.1% for a majority-vote baseline, a 31.3 point gain. At 50% corruption accuracy stayed at 90.5% with a 92.1% safety rate.</li>
+      <li>Limitations are documented: attacks are simulated, sequences are synthetic and calibration drifts under corruption.</li>
+    </ul>
+    <div class="tags"><span class="tag">PyTorch</span><span class="tag">ResNet-18</span><span class="tag">CNN-LSTM</span><span class="tag">OpenCV</span><span class="tag">GTSRB</span><span class="tag">Adversarial robustness</span></div>
+  </article>
+  <article class="entry">
+    <div class="entry-top"><h3>Financial statement audit agent</h3><span class="when">2026 · SFU research</span></div>
+    <ul><li>Reviews real company filings, flags errors and cites the exact accounting rule broken. It is grounded in 17,800+ standards and reached 95% accuracy on a 1,089-case test set. Details are under Research.</li></ul>
+  </article>
+  <article class="entry">
+    <div class="entry-top"><h3>Red-teaming &amp; evaluation service</h3><span class="when">2026 · BC Government</span></div>
+    <ul><li>PyRIT-based adversarial testing of a multi-agent RAG system with Crescendo and TAP attacks and LLM-as-judge scoring, containerized for OpenShift. Details are under Experience.</li></ul>
+  </article>
+  <article class="entry">
+    <div class="entry-top"><h3>GovernAI</h3><span class="when">2025 · TechVest Global</span></div>
+    <ul><li>Multi-agent AI output evaluation platform scoring 44 behavioral metrics, with PII detection, human oversight routing and mapping to the EU AI Act, NIST AI RMF and ISO 42001.</li></ul>
+    <div class="tags"><span class="tag">Multi-agent</span><span class="tag">AI governance</span><span class="tag">Dashboard</span></div>
+  </article>
+
+  <h3 class="group">Products &amp; competitions</h3>
+  <article class="entry">
+    <span class="badge pink">People's Choice</span>
+    <div class="entry-top"><h3>AskSFU</h3><span class="when">2025 – 2026</span></div>
+    <div class="where">SFU's first AI-powered student support chatbot · CMPT 363 Team 7</div>
+    <ul>
+      <li>Answers questions on courses, professors, clubs and campus maps, and reads an uploaded schedule or transcript (GPT-4o Vision) to suggest courses and open time slots.</li>
+      <li>Compared vector RAG and GraphRAG pipelines. It stays on SFU topics and avoids sensitive questions.</li>
+      <li>Usability-tested with a cognitive walkthrough. The findings led to loading feedback, a reordered landing page and a clearer upload step.</li>
+    </ul>
+    <div class="tags"><span class="tag">Python</span><span class="tag">LangChain</span><span class="tag">GPT-4</span><span class="tag">RAG</span><span class="tag">GraphRAG</span><span class="tag">Node.js</span><span class="tag">UI/UX</span></div>
+    <div class="plinks"><a href="https://github.com/manmad-web/AskSFU-Chatbot" target="_blank" rel="noopener">App &#8599;</a><a href="https://github.com/manmad-web/sfu-chatbot-backend" target="_blank" rel="noopener">Backend &#8599;</a><a href="https://github.com/manmad-web/asksfu-cmpt363" target="_blank" rel="noopener">CMPT 363 version &#8599;</a></div>
+  </article>
+  <article class="entry">
+    <span class="badge gold">1st Place</span>
+    <div class="entry-top"><h3>Moment Intelligence</h3><span class="when">Aug – Nov 2025</span></div>
+    <div class="where">Chang Institute Catalyst Challenge · With Gowtam and Mahidhar</div>
+    <ul>
+      <li>An AI supplier discovery dashboard for Moment Energy. It targets manual supplier search, the FEOC compliance black hole and the technical translation gap with compliant-supplier discovery, risk scoring and market intelligence.</li>
+      <li>Multi-agent RAG pipeline that crawls, vectorizes and retrieves supplier profiles, compliance records and specs. Pitched to the CEO and COO.</li>
+    </ul>
+    <div class="tags"><span class="tag">React</span><span class="tag">LangChain</span><span class="tag">n8n</span><span class="tag">RAG</span><span class="tag">Supply chain</span></div>
+  </article>
+  <article class="entry">
+    <div class="entry-top"><h3>SFSS Nexus</h3><span class="when">Jan – May 2025</span></div>
+    <div class="where">Simon Fraser Student Society · Associate VP</div>
+    <ul>
+      <li>A mobile-first app concept that brings the student society's services into one place: a personalized dashboard, room booking, event discovery with RSVP, a club directory, support services and an executive portal.</li>
+      <li>I owned the product vision and defined the technical requirements and data integration architecture.</li>
+    </ul>
+    <div class="tags"><span class="tag">Product vision</span><span class="tag">Mobile UX</span><span class="tag">Data integration</span></div>
+  </article>
+  <article class="entry">
+    <span class="badge">2nd Runner-up</span>
+    <div class="entry-top"><h3>ZENJI</h3><span class="when">April 2026</span></div>
+    <ul><li>A zero-sugar synbiotic gut-health drink that upcycles imperfect produce, validated through market sizing, unit economics and competitive positioning. Chang Institute Top Idea Prize.</li></ul>
+    <div class="tags"><span class="tag">Venture</span><span class="tag">Unit economics</span><span class="tag">Market sizing</span></div>
+  </article>
+
+  <h3 class="group">Coursework &amp; tools</h3>
+  <article class="entry">
+    <div class="entry-top"><h3>Rate CS Staff</h3><span class="when">CMPT 276</span></div>
+    <ul><li>A full CRUD web app for rating CS teaching staff, with validated forms, unique emails, confirm-before-delete, role-based display titles through polymorphism and a full test suite.</li></ul>
+    <div class="tags"><span class="tag">Java</span><span class="tag">Spring Boot</span><span class="tag">Thymeleaf</span><span class="tag">PostgreSQL</span><span class="tag">Docker</span></div>
+    <div class="plinks"><a href="https://github.com/manmad-web/rate-cs-staff" target="_blank" rel="noopener">GitHub &#8599;</a></div>
+  </article>
+  <article class="entry">
+    <div class="entry-top"><h3>This portfolio console</h3><span class="when">2026</span></div>
+    <ul><li>The site you're on: a 3D mechanical keyboard in plain HTML, CSS and SVG with no framework, typed screen text, accessible dialogs and reduced-motion support.</li></ul>
+    <div class="tags"><span class="tag">HTML</span><span class="tag">CSS</span><span class="tag">SVG</span><span class="tag">JavaScript</span></div>
+    <div class="plinks"><a href="https://github.com/manmad-web/portfolio-console" target="_blank" rel="noopener">GitHub &#8599;</a></div>
+  </article>
 </template>
 
 <template id="t-stack">
-    <p class="lede">The tools I reach for, grouped by where they sit in a build.</p>
-    <div class="skill-grid">
-      <div><h3>Languages</h3><div class="tags"><span class="tag">Python</span><span class="tag">SQL</span><span class="tag">C++</span></div></div>
-      <div><h3>AI / ML</h3><div class="tags"><span class="tag">PyTorch</span><span class="tag">scikit-learn</span><span class="tag">LangChain</span><span class="tag">LangGraph</span><span class="tag">AutoGen</span><span class="tag">CrewAI</span><span class="tag">PyRIT</span><span class="tag">RAG pipelines</span></div></div>
-      <div><h3>Web development</h3><div class="tags"><span class="tag">React</span><span class="tag">Node.js</span><span class="tag">Tailwind CSS</span><span class="tag">HTML/CSS</span><span class="tag">REST APIs</span></div></div>
-      <div><h3>Infrastructure &amp; DevOps</h3><div class="tags"><span class="tag">Azure</span><span class="tag">Docker</span><span class="tag">OpenShift</span><span class="tag">AWS (S3, EC2)</span><span class="tag">PostgreSQL</span><span class="tag">pgvector</span><span class="tag">FastAPI</span><span class="tag">Git / CI/CD</span></div></div>
-      <div><h3>AI-assisted development</h3><div class="tags"><span class="tag">Claude Code</span><span class="tag">Cursor</span><span class="tag">Windsurf</span><span class="tag">Mem0</span><span class="tag">n8n</span><span class="tag">Base44</span><span class="tag">Emergent</span><span class="tag">Google Stitch</span></div></div>
-    </div>
+  <p class="lede">Everything I've used across work, research, coursework and competitions, grouped by where it sits in a build.</p>
+  <div class="skill-grid">
+    <div><h3>Languages</h3><div class="tags"><span class="tag">Python</span><span class="tag">Java</span><span class="tag">JavaScript</span><span class="tag">SQL</span><span class="tag">C++</span><span class="tag">HTML/CSS</span><span class="tag">Shell</span></div></div>
+    <div><h3>AI, ML &amp; evaluation</h3><div class="tags"><span class="tag">PyTorch</span><span class="tag">torchvision</span><span class="tag">ResNet-18</span><span class="tag">CNN + LSTM</span><span class="tag">scikit-learn</span><span class="tag">NumPy</span><span class="tag">OpenCV</span><span class="tag">LangChain</span><span class="tag">LangGraph</span><span class="tag">AutoGen</span><span class="tag">CrewAI</span><span class="tag">PyRIT</span><span class="tag">RAG</span><span class="tag">GraphRAG</span><span class="tag">GPT-4 / GPT-4o</span><span class="tag">LLM-as-judge</span><span class="tag">Red-teaming</span></div></div>
+    <div><h3>Web &amp; backend</h3><div class="tags"><span class="tag">React</span><span class="tag">Node.js</span><span class="tag">Spring Boot</span><span class="tag">Thymeleaf</span><span class="tag">FastAPI</span><span class="tag">REST APIs</span><span class="tag">Tailwind CSS</span></div></div>
+    <div><h3>Data &amp; infrastructure</h3><div class="tags"><span class="tag">PostgreSQL</span><span class="tag">pgvector</span><span class="tag">SEC EDGAR / XBRL</span><span class="tag">Docker</span><span class="tag">OpenShift</span><span class="tag">Azure</span><span class="tag">AWS (S3, EC2)</span><span class="tag">Git / CI/CD</span></div></div>
+    <div><h3>AI-assisted development</h3><div class="tags"><span class="tag">Claude Code</span><span class="tag">Cursor</span><span class="tag">Windsurf</span><span class="tag">Mem0</span><span class="tag">n8n</span><span class="tag">Base44</span><span class="tag">Emergent</span><span class="tag">Google Stitch</span></div></div>
+    <div><h3>Product &amp; design</h3><div class="tags"><span class="tag">UI/UX design</span><span class="tag">Cognitive walkthroughs</span><span class="tag">Product requirements</span><span class="tag">Market sizing</span><span class="tag">Unit economics</span><span class="tag">Pitching</span></div></div>
+  </div>
 </template>
 
 <template id="t-about">
