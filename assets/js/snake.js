@@ -265,7 +265,6 @@
       pauseBtn.setAttribute('aria-pressed', String(p));
       pauseBtn.setAttribute('aria-label', p ? 'Resume the snake' : 'Pause the snake');
       pauseBtn.title = p ? 'Play (P)' : 'Pause (P)';
-      pauseBtn.textContent = p ? 'Play' : 'Pause';
     }
   }
   if (pauseBtn) pauseBtn.addEventListener('click', () => setPaused(!userPaused));
