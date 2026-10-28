@@ -187,3 +187,17 @@ dialog::backdrop { background: rgba(17, 17, 17, .55); backdrop-filter: none; }
   .shot.two { grid-template-columns: 1fr; }
 }
 .star-count #star-num { font-feature-settings: "zero" 0; }
+
+/* ---------- "Press the keys" hint under the intro ---------- */
+.intro h1 { grid-column: 1; grid-row: 1 / span 2; align-self: end; }
+.intro p:not(.hint) { grid-column: 2; grid-row: 1; align-self: end; }
+.intro-row { grid-row: 3; }
+.intro .hint { grid-column: 2; grid-row: 2; margin: 2px 0 0; padding-left: 18px; max-width: none; border-left: 0; display: flex; align-items: center; gap: 10px; font-family: var(--ui-mono); font-size: 12.5px; font-weight: 500; letter-spacing: .1em; text-transform: uppercase; color: var(--red); }
+.hint-arrow { display: inline-grid; place-items: center; width: 24px; height: 24px; flex: none; font-size: 16px; line-height: 1; color: #fff; background: var(--red); border: 2px solid var(--ink); border-radius: 4px; box-shadow: 2px 2px 0 var(--ink); animation: hint-bob 1.6s ease-in-out infinite; }
+.hint-phone { display: none; }
+@keyframes hint-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(3px); } }
+@media (prefers-reduced-motion: reduce) { .hint-arrow { animation: none; } }
+@media (max-width: 800px) { .intro h1, .intro p:not(.hint), .intro .hint, .intro-row { grid-column: 1; grid-row: auto; } .intro .hint { padding-left: 0; } }
+@media (max-width: 820px), (hover: none) and (pointer: coarse) { .hint-desk { display: none; } .hint-phone { display: inline; } .intro .hint { font-size: 12px; } }
+/* Leave room for the hint so the whole console still fits on a laptop screen. */
+.device { max-width: min(1120px, max(520px, calc((100svh - 285px) * 1.5))); }

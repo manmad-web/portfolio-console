@@ -40,7 +40,7 @@
   let SNAKE = [17, 17, 17], EYE = '#F5EFE3', A0 = 0.34, A1 = 0.5, GLOW = 0, STROKE = '';   // overridden by the theme (see theme.css)
   const PRIZES = ['#EC6426', '#F8A91F', '#E4A5CA', '#FDE3CF', '#72AC43'];
   // Anything with words on it. Measured live, so edits to the page are picked up.
-  const TEXT = ['.mark', 'nav.main', '.hdr-right', '.intro-row', '.intro h1', '.intro p',
+  const TEXT = ['.mark', 'nav.main', '.hdr-right', '.intro-row', '.intro h1', '.intro p', '.hint',
                 'footer span', '#mail-menu', '.star-count', 'dialog[open]'];
 
   let W = 0, H = 0, dpr = 1, textRects = [], dev = null, usable = true;
