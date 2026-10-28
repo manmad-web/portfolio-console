@@ -7,13 +7,12 @@
      email menu are off limits. Neither the snake nor a prize can enter
      them, so the content is never covered. The zones are measured from the
      real page and re-measured as it changes.
-   - Runs by itself, very slowly. It finds the nearest prize with a
-     breadth-first search that goes around the forbidden zones.
-   - Arrow keys take over. After a while without input it goes back to
-     playing itself. The arrow keys cannot steer it into a forbidden zone.
-   - It starts as just a head. Eating a prize makes it longer and adds
-     to the star counter under Let's Talk. It never dies: running into itself
-     just trims its tail.
+   - It never moves on its own. It starts as just a head and only moves
+     when you press the arrow keys: one step per press, and holding a key
+     keeps it going at a slow, steady pace.
+   - It can never be steered into a forbidden zone (text, header, console).
+   - Eating a prize makes it longer and adds to the star counter under
+     Let's Talk. It never dies: running into itself just trims its tail.
    - Off by default for visitors who prefer reduced motion. A footer button
      turns it on or off and remembers the choice on this device.
    ========================================================================== */
@@ -26,8 +25,7 @@
   const reducedMq = matchMedia('(prefers-reduced-motion: reduce)');
 
   const CELL = 24;               // grid size in CSS pixels
-  const TICK = 450;              // ms per step: very slow
-  const USER_HOLD = 15000;       // ms the arrow keys keep control after the last press
+  const REPEAT = 170;            // ms between steps while a key is held down
   const GROW = 3;                // segments gained per prize
   const MARGIN = 14;             // px of breathing room kept around text
   const SNAKE = [92, 225, 200];  // mint, clearly different from the warm page palette
@@ -37,9 +35,9 @@
                  '#device', 'footer span', '#mail-menu', '.star-count', 'dialog[open]'];
 
   let cols = 0, rows = 0, dpr = 1, wall = new Uint8Array(0), freeCount = 0, usable = true;
-  let snake = [], dir = { x: 1, y: 0 }, queued = null, queue2 = null, growth = 0;
+  let snake = [], dir = { x: 1, y: 0 }, growth = 0;
   let prizes = [];
-  let lastInput = -Infinity, acc = 0, last = 0, raf = 0, on = false, eaten = 0, flash = 0;
+  let lastMove = 0, raf = 0, on = false, eaten = 0, flash = 0;
 
   const wrap = (v, n) => (v % n + n) % n;
   const same = (a, b) => a.x === b.x && a.y === b.y;
@@ -110,66 +108,26 @@
     let c = null;
     for (let tries = 0; tries < 300 && !c; tries++) { const t = { x: rnd(cols), y: rnd(rows) }; if (!isWall(t)) c = t; }
     snake = c ? [c] : [];
-    growth = 0; queued = queue2 = null; dir = { x: 1, y: 0 };
+    growth = 0; dir = { x: 1, y: 0 };
   }
   function showCount() { if (counter) counter.textContent = '★ ' + eaten; }
   const head = () => snake[0];
   const nextOf = d => ({ x: wrap(head().x + d.x, cols), y: wrap(head().y + d.y, rows) });
-  const safe = d => { const c = nextOf(d); return !isWall(c) && !hits(c, true); };
-  const open = d => !isWall(nextOf(d));                          // free of text, though it may bite itself
-  const turns = () => [dir, { x: dir.y, y: -dir.x }, { x: -dir.y, y: dir.x }];
 
-  // Breadth-first search over free cells, wrapping at the edges, to the nearest prize.
-  function pathStep() {
-    if (!prizes.length) return null;
-    const start = head(), seen = new Int32Array(cols * rows).fill(-1), first = new Int8Array(cols * rows).fill(-1);
-    const body = new Set(snake.slice(0, -1).map(idx));
-    const dirs = [dir, { x: dir.y, y: -dir.x }, { x: -dir.y, y: dir.x }];
-    const targets = new Set(prizes.map(idx));
-    const q = [];
-    dirs.forEach((d, i) => {
-      const c = { x: wrap(start.x + d.x, cols), y: wrap(start.y + d.y, rows) }, k = idx(c);
-      if (isWall(c) || body.has(k) || seen[k] >= 0) return;
-      seen[k] = 1; first[k] = i; q.push(c);
-    });
-    for (let h = 0; h < q.length; h++) {
-      const c = q[h], k = idx(c);
-      if (targets.has(k)) return dirs[first[k]];
-      for (const d of [{ x: 1, y: 0 }, { x: -1, y: 0 }, { x: 0, y: 1 }, { x: 0, y: -1 }]) {
-        const n = { x: wrap(c.x + d.x, cols), y: wrap(c.y + d.y, rows) }, nk = idx(n);
-        if (seen[nk] >= 0 || isWall(n) || body.has(nk)) continue;
-        seen[nk] = seen[k] + 1; first[nk] = first[k]; q.push(n);
-      }
-    }
-    return null;
-  }
-  function autoSteer() {
-    const options = turns().filter(safe);
-    if (!options.length) return null;
-    if (Math.random() < 0.05) return options[rnd(options.length)];   // wander a little
-    return pathStep() || (safe(dir) ? dir : options[0]);
-  }
-  function step(now) {
+  // One step in direction d. Text areas are never entered; running into yourself only trims the tail.
+  function move(d) {
     if (!usable || !snake.length) return;
-    const userControl = now - lastInput < USER_HOLD;
-    let d = null;
-    if (userControl) {
-      if (queued) { const q = queued; queued = queue2; queue2 = null; if (open(q)) d = q; }   // arrows never enter text areas
-      if (!d && open(dir)) d = dir;
-    } else {
-      queued = queue2 = null;
-      d = autoSteer();
-    }
-    if (!d) d = turns().find(safe) || turns().find(open) || (open({ x: -dir.x, y: -dir.y }) ? { x: -dir.x, y: -dir.y } : null);
-    if (!d) { restart(); return; }                                   // boxed in by text: start over somewhere free
+    const nh = nextOf(d);
+    if (isWall(nh)) return;                                          // forbidden: stay where you are
+    if (snake.length > 1 && same(nh, snake[1])) return;              // no instant U-turn onto the neck
     dir = d;
-    const nh = { x: wrap(head().x + dir.x, cols), y: wrap(head().y + dir.y, rows) };
     const bite = snake.findIndex((s, i) => i > 0 && same(s, nh));
     if (bite > 0) snake.length = Math.max(1, bite);                  // never dies, just trims
     snake.unshift(nh);
     const pi = prizes.findIndex(p => same(p, nh));
     if (pi >= 0) { prizes.splice(pi, 1); growth += GROW; eaten++; flash = performance.now(); showCount(); fillPrizes(); }
     if (growth > 0) growth--; else snake.pop();
+    draw(performance.now());
   }
 
   /* ---------- drawing ---------- */
@@ -209,11 +167,9 @@
   let lastMeasure = 0;
   function frame(now) {
     raf = requestAnimationFrame(frame);
-    if (document.hidden) { last = now; return; }
-    if (now - lastMeasure > 500) { lastMeasure = now; measure(); }     // pick up layout changes and the email menu
-    acc += Math.min(now - last, 250); last = now;
-    while (acc >= TICK) { step(now); acc -= TICK; }
-    draw(now);
+    if (document.hidden) return;
+    if (now - lastMeasure > 500) { lastMeasure = now; measure(); }   // pick up layout changes and the email menu
+    draw(now);                                                       // stars twinkle; the snake itself never moves here
   }
 
   /* ---------- on / off ---------- */
@@ -227,7 +183,7 @@
     if (v) {
       measure();
       if (!snake.length) restart();
-      last = performance.now(); acc = 0; raf = requestAnimationFrame(frame);
+      raf = requestAnimationFrame(frame);
     } else {
       ctx.clearRect(0, 0, canvas.width / dpr, canvas.height / dpr);
     }
@@ -246,10 +202,10 @@
     const t = e.target;
     if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))) return;
     e.preventDefault();
-    const base = queued || dir;
-    if (d.x === -base.x && d.y === -base.y) return;                  // no instant U-turns
-    if (!queued) queued = d; else queue2 = d;                        // remember a second quick press
-    lastInput = performance.now();
+    const now = performance.now();
+    if (e.repeat && now - lastMove < REPEAT) return;                 // slow, steady pace while a key is held
+    lastMove = now;
+    move(d);
   });
 
   /* ---------- boot ---------- */
