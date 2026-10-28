@@ -89,9 +89,10 @@
   /* ---------- 2. Keycaps ---------- */
   const pct = (v, d) => (v / d * 100).toFixed(4) + '%';
   KEYS.forEach((k, i) => {
-    const el = document.createElement(k.contact ? 'a' : 'button');
-    if (k.contact) { el.href = '#contact'; el.setAttribute('data-contact', ''); }
-    else { el.type = 'button'; el.dataset.open = k.open; el.setAttribute('aria-haspopup', 'dialog'); }
+    const el = document.createElement('button');
+    el.type = 'button';
+    if (k.contact) { el.setAttribute('data-mail', ''); el.setAttribute('aria-haspopup', 'true'); }
+    else { el.dataset.open = k.open; el.setAttribute('aria-haspopup', 'dialog'); }
     el.className = 'key' + (k.w < 120 ? ' sm' : '') + (k.bar ? ' bar' : '');
     el.style.cssText = `left:${pct(k.x - k.w / 2, W)};top:${pct(k.y - k.h / 2, H)};width:${pct(k.w, W)};height:${pct(k.h, H)};--c:${k.c};--b:${k.b};--ink:${k.ink};--i:${i}`;
     el.setAttribute('aria-label', k.bar ? "Let's talk: contact" : `${k.ltr === '★' ? 'Portfolio' : k.ltr}: ${k.title}`);
@@ -222,26 +223,83 @@
   document.addEventListener('click', e => {
     const b = e.target.closest('[data-open]');
     if (b) { openSection(b.dataset.open, b); return; }
-    const c = e.target.closest('[data-contact]');
-    if (c) {
-      e.preventDefault();
-      $('contact').scrollIntoView({ behavior: reduced.matches ? 'auto' : 'smooth', block: 'start' });
-      $('contact-h').focus({ preventScroll: true });
-    }
+    const m = e.target.closest('[data-mail], #mail-btn');
+    if (m) { mailMenu.hidden ? openMail(m) : closeMail(true); return; }
+    if (!mailMenu.hidden && !e.target.closest('#mail-menu')) closeMail(false);
   });
 
-  // Copy email, with a select-the-text fallback when the clipboard is blocked.
-  const copied = $('copied');
-  $('copy-email').addEventListener('click', () => {
-    const addr = $('email').textContent.trim();
-    const fallback = () => {
-      const r = document.createRange(); r.selectNodeContents($('email'));
-      const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r);
-      copied.textContent = 'Email selected. Press Ctrl/Cmd + C to copy.';
-    };
-    try { navigator.clipboard.writeText(addr).then(() => { copied.textContent = 'Email copied.'; }, fallback); }
-    catch (e) { fallback(); }
+  /* ---------- 8. Email dropdown ---------- */
+  // The header icon, Let's Talk and the contact keys all open one menu: school or Gmail.
+  const mailMenu = $('mail-menu'), mailBtn = $('mail-btn'), mailStatus = $('mail-status');
+  let mailFrom = null;
+  function openMail(from) {
+    if (panel.open) panel.close();
+    mailFrom = from || mailBtn;
+    mailMenu.hidden = false;
+    mailBtn.setAttribute('aria-expanded', 'true');
+    window.scrollTo({ top: 0, behavior: reduced.matches ? 'auto' : 'smooth' });
+    mailStatus.textContent = '';
+    mailMenu.querySelector('a').focus({ preventScroll: true });
+  }
+  function closeMail(refocus) {
+    mailMenu.hidden = true;
+    mailBtn.setAttribute('aria-expanded', 'false');
+    if (refocus && mailFrom && document.contains(mailFrom)) mailFrom.focus();
+    mailFrom = null;
+  }
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && !mailMenu.hidden) closeMail(true); });
+  mailMenu.addEventListener('focusout', e => {
+    if (e.relatedTarget && !mailMenu.contains(e.relatedTarget) && e.relatedTarget !== mailBtn) closeMail(false);
   });
+  // Copy an address, with a select-the-text fallback when the clipboard is blocked.
+  mailMenu.addEventListener('click', e => {
+    const b = e.target.closest('[data-copy]'); if (!b) return;
+    const addrEl = b.closest('.mail-row').querySelector('.addr');
+    const fallback = () => {
+      const r = document.createRange(); r.selectNodeContents(addrEl);
+      const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r);
+      mailStatus.textContent = 'Address selected. Press Ctrl/Cmd + C to copy.';
+    };
+    try { navigator.clipboard.writeText(addrEl.textContent.trim()).then(() => { mailStatus.textContent = 'Copied ' + addrEl.textContent.trim(); }, fallback); }
+    catch (err) { fallback(); }
+  });
+
+  /* ---------- 9. Voice intro (starts only when tapped; browsers block autoplay audio) ---------- */
+  const voiceBtn = $('voice'), voiceLabel = $('voice-label');
+  if ('speechSynthesis' in window && 'SpeechSynthesisUtterance' in window) {
+    voiceBtn.hidden = false;
+    const SCRIPT = "Hi, I'm Manish. I'm a computer science student at S F U, building A I agents, evaluations and red-teaming tools. Press the keys on the console to explore my work.";
+    const setVoice = on => { voiceBtn.setAttribute('aria-pressed', String(on)); voiceLabel.textContent = on ? 'Stop' : 'Hear intro'; };
+    const stopVoice = () => { speechSynthesis.cancel(); setVoice(false); };
+    voiceBtn.addEventListener('click', () => {
+      if (speechSynthesis.speaking) { stopVoice(); showWelcome(); return; }
+      const u = new SpeechSynthesisUtterance(SCRIPT);
+      const en = speechSynthesis.getVoices().filter(v => /^en/i.test(v.lang));
+      u.voice = en.find(v => /en-(CA|US|GB)/i.test(v.lang) && v.localService) || en[0] || null;
+      u.lang = (u.voice && u.voice.lang) || 'en-US';
+      u.rate = 1; u.pitch = 1;
+      u.onend = u.onerror = () => { setVoice(false); showWelcome(); };
+      setVoice(true);
+      typeTo("Hi, I'm Manish.", 'Press the keys to explore my work.', 60);
+      speechSynthesis.cancel();
+      speechSynthesis.speak(u);
+    });
+    document.addEventListener('visibilitychange', () => { if (document.hidden) stopVoice(); });
+    window.addEventListener('pagehide', stopVoice);
+  }
+
+  /* ---------- 10. Game slot (set window.PORTFOLIO_GAME in keymap.js to show the button) ---------- */
+  const game = window.PORTFOLIO_GAME;
+  if (game && game.src) {
+    const gameDlg = $('game-dialog'), gameFrame = $('game-frame'), gameBtn = $('game-btn');
+    $('game-title').textContent = game.title || 'Game';
+    gameFrame.title = game.title || 'Game';
+    gameBtn.hidden = false;
+    gameBtn.addEventListener('click', () => { gameFrame.src = game.src; gameDlg.showModal(); $('game-close').focus(); });
+    $('game-close').addEventListener('click', () => gameDlg.close());
+    gameDlg.addEventListener('click', e => { if (e.target === gameDlg) gameDlg.close(); });
+    gameDlg.addEventListener('close', () => { gameFrame.removeAttribute('src'); gameBtn.focus(); });   // stops the game
+  }
 
   /* ---------- Boot ---------- */
   showWelcome();

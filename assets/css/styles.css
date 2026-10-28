@@ -255,3 +255,28 @@ header.top { padding-block: 12px; }
 .contact { padding-block: 120px 72px; }
 
 @media (max-width: 520px) { .hdr-right { gap: 6px; } .icon-btn { width: 34px; height: 34px; } .talk { padding: 8px 12px; } }
+
+/* ---------- Email dropdown, voice chip, game slot ---------- */
+.hdr-right { position: relative; }
+button.talk { font: inherit; font-size: 14px; font-weight: 600; color: inherit; background: none; cursor: pointer; }
+.mail-menu { position: absolute; right: 0; top: calc(100% + 10px); z-index: 30; width: min(360px, calc(100vw - 32px)); padding: 16px; display: grid; gap: 12px; text-align: left; background: var(--panel); border: 1px solid var(--line); border-radius: 16px; box-shadow: 0 24px 60px rgba(0,0,0,.6); }
+.mail-title { margin: 0; font-family: var(--mono); font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--amber); font-weight: 700; }
+.mail-row { display: grid; gap: 8px; padding-top: 12px; border-top: 1px solid var(--line); }
+.mail-who { display: grid; gap: 2px; min-width: 0; }
+.mail-label { font-size: 12px; color: var(--muted); font-weight: 600; letter-spacing: .06em; text-transform: uppercase; }
+.addr { font-family: var(--mono); font-size: 14px; color: var(--cream); overflow-wrap: anywhere; user-select: all; }
+.mail-acts { display: flex; flex-wrap: wrap; gap: 8px; }
+.pill.mini { padding: 8px 14px; font-size: 13px; }
+.mail-status { margin: 0; min-height: 1.2em; font-size: 13px; color: var(--leaf); }
+
+.intro-row { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 8px; }
+.chip { display: inline-flex; align-items: center; gap: 8px; font: inherit; font-size: 13px; font-weight: 600; color: var(--text); background: #1b1b1f; border: 1px solid var(--line); border-radius: 999px; padding: 6px 14px; cursor: pointer; }
+.chip:hover { border-color: var(--orange); color: var(--cream); }
+.chip[aria-pressed="true"] { background: rgba(236,100,38,.16); border-color: var(--orange); color: var(--cream); }
+.game-body { padding: 0; }
+.game-body iframe { display: block; width: 100%; height: min(70dvh, 640px); border: 0; background: #0b0b0d; border-radius: 0 0 20px 20px; }
+
+/* Console sits a little lower, still fully on one laptop screen */
+.device { max-width: min(1120px, max(520px, calc((100svh - 250px) * 1.5))); margin-top: 1%; margin-bottom: -4%; }
+
+[hidden] { display: none !important; }

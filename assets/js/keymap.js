@@ -53,3 +53,8 @@ window.PORTFOLIO_SECTIONS = {
   certs:      { t: 't-certs',      h: 'Certifications' },
   timeline:   { t: 't-timeline',   h: 'Portfolio timeline' },
 };
+
+/* "Take a break" game slot. Leave as null to hide the button.
+   To turn it on, put an offline game (plain HTML/JS) in games/<name>/ and set:
+   window.PORTFOLIO_GAME = { title: 'Game name', src: 'games/<name>/index.html' }; */
+window.PORTFOLIO_GAME = null;
