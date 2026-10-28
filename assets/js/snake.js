@@ -37,13 +37,15 @@
   let cols = 0, rows = 0, dpr = 1, wall = new Uint8Array(0), freeCount = 0, usable = true;
   let snake = [], dir = { x: 1, y: 0 }, growth = 0;
   let prizes = [];
-  let lastMove = 0, raf = 0, on = false, eaten = 0, flash = 0;
+  let lastMove = 0, raf = 0, on = false, eaten = 0, flash = 0, rpos = [], lastDraw = 0;
 
   const wrap = (v, n) => (v % n + n) % n;
   const same = (a, b) => a.x === b.x && a.y === b.y;
   const hits = (cell, skipTail) => snake.some((s, i) => !(skipTail && i === snake.length - 1) && same(s, cell));
   const rnd = n => Math.floor(Math.random() * n);
   const idx = c => c.y * cols + c.x;
+  const center = c => ({ x: c.x * CELL + CELL / 2, y: c.y * CELL + CELL / 2 });
+  const syncR = () => { rpos = snake.map(center); };      // snap the drawn snake onto its cells
   const isWall = c => wall[idx(c)] === 1;
 
   function stored() { try { return localStorage.getItem('portfolio-snake'); } catch (e) { return null; } }
@@ -81,6 +83,7 @@
     cols = Math.max(8, Math.floor(w / CELL)); rows = Math.max(6, Math.floor(h / CELL));
     prizes = prizes.filter(p => p.x < cols && p.y < rows);
     snake = snake.filter(s => s.x < cols && s.y < rows);
+    syncR();
     measure();
     if (!snake.length && on) restart();
     draw(performance.now());
@@ -108,9 +111,14 @@
     let c = null;
     for (let tries = 0; tries < 300 && !c; tries++) { const t = { x: rnd(cols), y: rnd(rows) }; if (!isWall(t)) c = t; }
     snake = c ? [c] : [];
+    syncR();
     growth = 0; dir = { x: 1, y: 0 };
   }
-  function showCount() { if (counter) counter.textContent = '★ ' + eaten; }
+  function showCount() {
+    if (!counter) return;
+    counter.textContent = '★ ' + eaten;
+    counter.classList.remove('bump'); void counter.offsetWidth; counter.classList.add('bump');
+  }
   const head = () => snake[0];
   const nextOf = d => ({ x: wrap(head().x + d.x, cols), y: wrap(head().y + d.y, rows) });
 
@@ -121,13 +129,14 @@
     if (isWall(nh)) return;                                          // forbidden: stay where you are
     if (snake.length > 1 && same(nh, snake[1])) return;              // no instant U-turn onto the neck
     dir = d;
+    const from = rpos[0] ? { x: rpos[0].x, y: rpos[0].y } : center(nh);
     const bite = snake.findIndex((s, i) => i > 0 && same(s, nh));
     if (bite > 0) snake.length = Math.max(1, bite);                  // never dies, just trims
-    snake.unshift(nh);
+    rpos.length = snake.length;
+    snake.unshift(nh); rpos.unshift(from);
     const pi = prizes.findIndex(p => same(p, nh));
     if (pi >= 0) { prizes.splice(pi, 1); growth += GROW; eaten++; flash = performance.now(); showCount(); fillPrizes(); }
-    if (growth > 0) growth--; else snake.pop();
-    draw(performance.now());
+    if (growth > 0) growth--; else { snake.pop(); rpos.pop(); }
   }
 
   /* ---------- drawing ---------- */
@@ -149,14 +158,23 @@
     for (const p of prizes) star(p.x * CELL + CELL / 2, p.y * CELL + CELL / 2, CELL * 0.4, p.color, t, p.phase);
     const n = snake.length;
     if (!n) return;
+    if (rpos.length !== n) syncR();
+    // Glide: each drawn segment eases toward its cell instead of jumping.
+    const dt = Math.min(t - lastDraw || 16, 100); lastDraw = t;
+    const ease = 1 - Math.exp(-dt / 75);
+    for (let i = 0; i < n; i++) {
+      const tg = center(snake[i]), p = rpos[i], dx = tg.x - p.x, dy = tg.y - p.y;
+      if (Math.abs(dx) > CELL * 1.6 || Math.abs(dy) > CELL * 1.6) { p.x = tg.x; p.y = tg.y; }   // wrapped past an edge: snap
+      else { p.x += dx * ease; p.y += dy * ease; }
+    }
     for (let i = n - 1; i >= 0; i--) {
-      const s = snake[i], k = 1 - i / n;
+      const p = rpos[i], k = 1 - i / n;
       ctx.beginPath();
-      ctx.arc(s.x * CELL + CELL / 2, s.y * CELL + CELL / 2, CELL * (0.3 + 0.22 * k), 0, 6.2832);
+      ctx.arc(p.x, p.y, CELL * (0.3 + 0.22 * k), 0, 6.2832);
       ctx.fillStyle = `rgba(${SNAKE[0]},${SNAKE[1]},${SNAKE[2]},${(0.22 + 0.4 * k).toFixed(3)})`;
       ctx.fill();
     }
-    const h = snake[0], hx = h.x * CELL + CELL / 2, hy = h.y * CELL + CELL / 2;
+    const hx = rpos[0].x, hy = rpos[0].y;
     const pop = Math.max(0, 1 - (t - flash) / 450);
     ctx.beginPath(); ctx.arc(hx, hy, CELL * (0.5 + 0.22 * pop), 0, 6.2832);
     ctx.fillStyle = `rgba(${SNAKE[0]},${SNAKE[1]},${SNAKE[2]},0.7)`; ctx.shadowColor = `rgb(${SNAKE[0]},${SNAKE[1]},${SNAKE[2]})`; ctx.shadowBlur = 14; ctx.fill();

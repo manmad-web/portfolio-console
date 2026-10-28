@@ -288,5 +288,8 @@ button.talk { font: inherit; font-size: 14px; font-weight: 600; color: inherit; 
 .linkish:hover { color: var(--cream); }
 
 /* Star counter under Let's Talk */
-.star-count { position: absolute; right: 4px; top: calc(100% + 4px); font-family: var(--mono); font-size: 12px; letter-spacing: .06em; color: var(--amber); font-variant-numeric: tabular-nums; pointer-events: none; }
+.star-count { position: absolute; right: 6px; top: calc(100% + 2px); font-family: var(--mono); font-size: 20px; font-weight: 700; line-height: 1; letter-spacing: .04em; color: var(--amber); font-variant-numeric: tabular-nums; pointer-events: none; }
 .star-count[hidden] { display: none; }
+.star-count.bump { animation: bump 320ms cubic-bezier(.22,1.5,.4,1); }
+@keyframes bump { 0% { transform: scale(1); } 40% { transform: scale(1.35); } 100% { transform: scale(1); } }
+@media (prefers-reduced-motion: reduce) { .star-count.bump { animation: none; } }
