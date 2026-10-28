@@ -7,9 +7,9 @@
      email menu are off limits. Neither the snake nor a prize can enter
      them, so the content is never covered. The zones are measured from the
      real page and re-measured as it changes.
-   - It never moves on its own. It starts as just a head and only moves
-     when you press the arrow keys: one step per press, and holding a key
-     keeps it going at a slow, steady pace.
+   - Like the classic game: it waits as just a head until your first arrow
+     press, then keeps moving forward by itself. The arrow keys only turn it.
+     It moves slowly and glides between cells. It never plays itself.
    - It can never be steered into a forbidden zone (text, header, console).
    - Eating a prize makes it longer and adds to the star counter under
      Let's Talk. It never dies: running into itself just trims its tail.
@@ -25,7 +25,7 @@
   const reducedMq = matchMedia('(prefers-reduced-motion: reduce)');
 
   const CELL = 24;               // grid size in CSS pixels
-  const REPEAT = 170;            // ms between steps while a key is held down
+  const TICK = 320;              // ms per step: slow and steady
   const GROW = 3;                // segments gained per prize
   const MARGIN = 14;             // px of breathing room kept around text
   const SNAKE = [92, 225, 200];  // mint, clearly different from the warm page palette
@@ -37,7 +37,7 @@
   let cols = 0, rows = 0, dpr = 1, wall = new Uint8Array(0), freeCount = 0, usable = true;
   let snake = [], dir = { x: 1, y: 0 }, growth = 0;
   let prizes = [];
-  let lastMove = 0, raf = 0, on = false, eaten = 0, flash = 0, rpos = [], lastDraw = 0;
+  let moving = false, queued = null, queue2 = null, acc = 0, last = 0, raf = 0, on = false, eaten = 0, flash = 0, rpos = [], lastDraw = 0;
 
   const wrap = (v, n) => (v % n + n) % n;
   const same = (a, b) => a.x === b.x && a.y === b.y;
@@ -112,7 +112,7 @@
     for (let tries = 0; tries < 300 && !c; tries++) { const t = { x: rnd(cols), y: rnd(rows) }; if (!isWall(t)) c = t; }
     snake = c ? [c] : [];
     syncR();
-    growth = 0; dir = { x: 1, y: 0 };
+    growth = 0; dir = { x: 1, y: 0 }; moving = false; queued = queue2 = null;
   }
   function showCount() {
     if (!counter) return;
@@ -138,6 +138,27 @@
     if (pi >= 0) { prizes.splice(pi, 1); growth += GROW; eaten++; flash = performance.now(); showCount(); fillPrizes(); }
     if (growth > 0) growth--; else { snake.pop(); rpos.pop(); }
   }
+
+  // One game tick: take a queued turn if there is one, otherwise keep going straight.
+  // Text areas are never entered; when something is in the way it turns to a free side.
+  function paused() {
+    const mm = document.getElementById('mail-menu');
+    return document.hidden || !!document.querySelector('dialog[open]') || (mm && !mm.hidden);
+  }
+  function tick() {
+    if (!moving || !usable || !snake.length || paused()) return;
+    const neck = snake.length > 1 ? snake[1] : null;
+    const ok = d => open(d) && !(neck && same(nextOf(d), neck));
+    let d = null;
+    if (queued) { const q = queued; queued = queue2; queue2 = null; if (ok(q)) d = q; }
+    if (!d && ok(dir)) d = dir;
+    if (!d) {
+      const sides = [{ x: dir.y, y: -dir.x }, { x: -dir.y, y: dir.x }].sort(() => Math.random() - 0.5);
+      d = sides.find(ok) || null;
+    }
+    if (d) move(d);
+  }
+  const open = d => !isWall(nextOf(d));
 
   /* ---------- drawing ---------- */
   function star(cx, cy, r, color, t, phase) {
@@ -185,9 +206,13 @@
   let lastMeasure = 0;
   function frame(now) {
     raf = requestAnimationFrame(frame);
-    if (document.hidden) return;
     if (now - lastMeasure > 500) { lastMeasure = now; measure(); }   // pick up layout changes and the email menu
-    draw(now);                                                       // stars twinkle; the snake itself never moves here
+    if (moving && !paused()) {
+      acc += Math.min(now - last, 250);
+      while (acc >= TICK) { tick(); acc -= TICK; }
+    } else acc = 0;
+    last = now;
+    draw(now);
   }
 
   /* ---------- on / off ---------- */
@@ -201,6 +226,7 @@
     if (v) {
       measure();
       if (!snake.length) restart();
+      last = performance.now(); acc = 0;
       raf = requestAnimationFrame(frame);
     } else {
       ctx.clearRect(0, 0, canvas.width / dpr, canvas.height / dpr);
@@ -220,10 +246,11 @@
     const t = e.target;
     if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))) return;
     e.preventDefault();
-    const now = performance.now();
-    if (e.repeat && now - lastMove < REPEAT) return;                 // slow, steady pace while a key is held
-    lastMove = now;
-    move(d);
+    if (e.repeat) return;
+    const base = queued || dir;
+    if (moving && d.x === -base.x && d.y === -base.y) return;       // no instant U-turn
+    if (!moving) { moving = true; queued = d; acc = TICK; last = performance.now(); return; }   // first press sets it off
+    if (!queued) queued = d; else queue2 = d;                        // remember a second quick press
   });
 
   /* ---------- boot ---------- */
