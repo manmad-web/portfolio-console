@@ -35,7 +35,7 @@
   const LOOK = 22;               // how far ahead the snake checks for text
   const MARGIN = 14;             // px of breathing room kept around text
   const EAT = 20;                // px reach for eating a prize
-  const SNAKE = [92, 225, 200];  // mint, clearly different from the warm page palette
+  let SNAKE = [17, 17, 17], EYE = '#F5EFE3', A0 = 0.34, A1 = 0.5, GLOW = 0, STROKE = '';   // overridden by the theme (see theme.css)
   const PRIZES = ['#EC6426', '#F8A91F', '#E4A5CA', '#FDE3CF', '#72AC43'];
   // Anything with words on it. Measured live, so edits to the page are picked up.
   const TEXT = ['.mark', 'nav.main', '.hdr-right', '.intro-row', '.intro h1', '.intro p',
@@ -55,6 +55,16 @@
   const inText = (x, y) => x < 10 || y < 10 || x > W - 10 || y > H - 10 || textRects.some(r => inRect(x, y, r));
   const ahead = (th, d) => !inText(hx + Math.cos(th) * d, hy + Math.sin(th) * d);
 
+  // Colours come from CSS variables so the snake always matches the page theme.
+  function readTheme() {
+    const cs = getComputedStyle(document.documentElement), v = n => cs.getPropertyValue(n).trim();
+    const rgb = v('--snake-rgb').split(',').map(Number);
+    if (rgb.length === 3 && rgb.every(n => n >= 0)) SNAKE = rgb;
+    EYE = v('--snake-eye') || EYE;
+    A0 = parseFloat(v('--snake-a0')) || A0; A1 = parseFloat(v('--snake-a1')) || A1;
+    GLOW = parseFloat(v('--snake-glow')); if (isNaN(GLOW)) GLOW = 0;
+    STROKE = v('--star-stroke');
+  }
   function stored() { try { return localStorage.getItem('portfolio-snake'); } catch (e) { return null; } }
   function remember(v) { try { localStorage.setItem('portfolio-snake', v); } catch (e) {} }
   function showCount() {
@@ -185,7 +195,8 @@
       ctx.lineTo(Math.cos(a) * rad, Math.sin(a) * rad);
     }
     ctx.closePath();
-    ctx.shadowColor = color; ctx.shadowBlur = 10; ctx.fillStyle = color; ctx.globalAlpha = 0.85; ctx.fill();
+    ctx.shadowColor = color; ctx.shadowBlur = GLOW ? 10 : 0; ctx.fillStyle = color; ctx.globalAlpha = 0.95; ctx.fill();
+    if (STROKE) { ctx.shadowBlur = 0; ctx.lineWidth = 1.5; ctx.strokeStyle = STROKE; ctx.stroke(); }
     ctx.restore();
   }
   function draw(t) {
@@ -197,13 +208,13 @@
     for (let i = n - 1; i >= 1; i--) {
       const k = 1 - i / n;
       ctx.beginPath(); ctx.arc(pts[i].x, pts[i].y, 6.5 + 5.5 * k, 0, TAU);
-      ctx.fillStyle = `rgba(${SNAKE[0]},${SNAKE[1]},${SNAKE[2]},${(0.22 + 0.4 * k).toFixed(3)})`;
+      ctx.fillStyle = `rgba(${SNAKE[0]},${SNAKE[1]},${SNAKE[2]},${(A0 + A1 * k * 0.6).toFixed(3)})`;
       ctx.fill();
     }
     const pop = Math.max(0, 1 - (t - flash) / 450);
     ctx.beginPath(); ctx.arc(hx, hy, 12 + 5 * pop, 0, TAU);
-    ctx.fillStyle = `rgba(${SNAKE[0]},${SNAKE[1]},${SNAKE[2]},0.7)`; ctx.shadowColor = `rgb(${SNAKE[0]},${SNAKE[1]},${SNAKE[2]})`; ctx.shadowBlur = 14; ctx.fill();
-    ctx.shadowBlur = 0; ctx.fillStyle = 'rgba(10,20,18,.85)';
+    ctx.fillStyle = `rgba(${SNAKE[0]},${SNAKE[1]},${SNAKE[2]},0.88)`; ctx.shadowColor = `rgb(${SNAKE[0]},${SNAKE[1]},${SNAKE[2]})`; ctx.shadowBlur = GLOW ? 14 : 0; ctx.fill();
+    ctx.shadowBlur = 0; ctx.fillStyle = EYE;
     const c = Math.cos(theta), s = Math.sin(theta);
     for (const sg of [-1, 1]) { ctx.beginPath(); ctx.arc(hx + c * 4 - s * 4 * sg, hy + s * 4 + c * 4 * sg, 1.8, 0, TAU); ctx.fill(); }
   }
@@ -280,6 +291,7 @@
   /* ---------- boot ---------- */
   addEventListener('resize', resize);
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(measure);
+  readTheme();
   resize();
   const pref = stored();
   setOn(pref ? pref === 'on' : !reducedMq.matches, false);

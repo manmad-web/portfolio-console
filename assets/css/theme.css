@@ -1,0 +1,147 @@
+/* ==========================================================================
+   Swiss Red theme
+   Warm cream paper, black ink, one red. Thin rules, heavy outlines on the
+   things you press, hard offset shadows for a tactile, 3D feel.
+   Loaded after styles.css, so everything here wins. The device itself
+   (case, keys, screen) keeps its own colours.
+   ========================================================================== */
+
+:root {
+  color-scheme: light;
+  --page: #F5EFE3;
+  --paper: #FBF7EC;          /* dialogs and menus sit on slightly lighter paper */
+  --ink: #111111;
+  --ink2: #46423B;           /* secondary text, still well above AA contrast */
+  --red: #D8281F;
+  --ui-sans: "Instrument Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --ui-mono: "DM Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --hard: 4px;               /* offset of the hard shadows */
+
+  /* snake.js reads these */
+  --snake-rgb: 17, 17, 17;
+  --snake-eye: #F5EFE3;
+  --snake-a0: 0.34;
+  --snake-a1: 0.5;
+  --snake-glow: 0;
+  --star-stroke: #111111;
+}
+
+/* Inside the page chrome the old dark-theme names mean ink and red. */
+header.top, .intro, .intro-row, footer, .star-count, dialog, .sheet, .mail-menu, .about {
+  --cream: var(--ink);
+  --amber: var(--red);
+  --orange: var(--red);
+  --pink: var(--red);
+  --text: var(--ink);
+  --muted: var(--ink2);
+  --line: var(--ink);
+  --panel: var(--paper);
+  --leaf: #1F6B3A;
+}
+
+html, body { background: var(--page); }
+body { color: var(--ink); font-family: var(--ui-sans); }
+.wrap { max-width: 1280px; }
+
+/* ---------- Header ---------- */
+header.top { border-bottom: 1.5px solid var(--ink); padding-block: 14px; }
+.mark { font-family: var(--ui-sans); font-weight: 700; font-size: 26px; letter-spacing: -.03em; color: var(--ink); }
+.mark span { color: var(--red); }
+nav.main button { color: var(--ink); font-family: var(--ui-mono); font-size: 12.5px; font-weight: 500; letter-spacing: .09em; text-transform: uppercase; border-radius: 0; padding: 8px 12px; }
+nav.main button:hover { background: var(--ink); color: var(--page); }
+
+/* The 3D buttons: square, heavy outline, hard shadow that squashes when pressed. */
+.icon-btn, button.talk, .pill, .close, .chip, .pp {
+  border: 2.5px solid var(--ink);
+  border-radius: 4px;
+  background: var(--page);
+  color: var(--ink);
+  box-shadow: var(--hard) var(--hard) 0 var(--ink);
+  transition: transform 120ms cubic-bezier(.2, .9, .3, 1.3), box-shadow 120ms cubic-bezier(.2, .9, .3, 1.3), background-color 120ms;
+}
+.icon-btn:hover, button.talk:hover, .pill:hover, .close:hover, .chip:hover, .pp:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: calc(var(--hard) + 1px) calc(var(--hard) + 1px) 0 var(--ink);
+  border-color: var(--ink);
+  color: var(--ink);
+}
+.icon-btn:active, button.talk:active, .pill:active, .close:active, .chip:active, .pp:active {
+  transform: translate(var(--hard), var(--hard));
+  box-shadow: 0 0 0 var(--ink);
+}
+.icon-btn { width: 42px; height: 42px; }
+.icon-btn[aria-expanded="true"] { background: var(--ink); color: var(--page); }
+button.talk { background: var(--red); color: #fff; font-family: var(--ui-mono); font-size: 12.5px; font-weight: 500; letter-spacing: .09em; text-transform: uppercase; padding: 10px 16px; }
+button.talk:hover { color: #fff; }
+.pill { font-family: var(--ui-sans); font-weight: 600; box-shadow: 3px 3px 0 var(--ink); }
+.pill.primary { background: var(--red); color: #fff; border-color: var(--ink); }
+.pill.primary:hover { color: #fff; }
+.pill.mini { padding: 7px 12px; font-size: 13px; }
+.close { padding: 7px 14px; box-shadow: 3px 3px 0 var(--ink); }
+.chip { box-shadow: 3px 3px 0 var(--ink); }
+.chip[aria-pressed="true"] { background: var(--ink); color: var(--page); }
+.pp { width: 28px; height: 28px; border-radius: 4px; box-shadow: 2px 2px 0 var(--ink); }
+.pp[aria-pressed="true"] { background: var(--red); border-color: var(--ink); color: #fff; }
+.star-count { color: var(--ink); font-family: var(--ui-mono); top: calc(100% + 8px); }
+.star-count #star-num { color: var(--red); }
+
+/* ---------- Intro: heading left, standfirst right ---------- */
+.intro { text-align: left; justify-items: start; padding: 30px 0 6px; gap: 12px; display: grid; grid-template-columns: 1.1fr 1fr; align-items: end; column-gap: 40px; }
+.intro h1 { font-family: var(--ui-sans); font-size: clamp(46px, 6.8vw, 96px); font-weight: 600; letter-spacing: -.055em; line-height: .92; grid-column: 1; color: var(--ink); }
+.name-btn { color: var(--red); }
+.name-btn:hover { border-bottom-color: var(--red); }
+.name-input { color: var(--red); background: var(--paper); border: 2px solid var(--ink); border-radius: 0; }
+.intro p { grid-column: 2; font-size: 17px; max-width: 44ch; border-left: 1.5px solid var(--ink); padding-left: 18px; color: var(--ink); }
+.intro-row { grid-column: 1 / -1; }
+@media (max-width: 800px) { .intro { grid-template-columns: 1fr; } .intro h1, .intro p { grid-column: 1; } }
+
+/* The console sits on paper: soften its floor shadow. */
+.device svg.case ellipse { opacity: .45; }
+
+/* ---------- Footer ---------- */
+footer { border-top: 1.5px solid var(--ink); color: var(--ink); font-family: var(--ui-mono); font-size: 12px; letter-spacing: .03em; }
+footer a, .linkish { color: var(--ink); }
+.linkish:hover, footer a:hover { color: var(--red); }
+
+/* ---------- Dialogs ---------- */
+dialog::backdrop { background: rgba(17, 17, 17, .55); backdrop-filter: none; }
+.sheet { background: var(--paper); border: 2.5px solid var(--ink); border-radius: 6px; box-shadow: 10px 10px 0 var(--ink); }
+.sheet-head { background: var(--paper); border-bottom: 2.5px solid var(--ink); }
+.sheet-head h2 { color: var(--ink); font-family: var(--ui-sans); font-weight: 600; letter-spacing: -.035em; font-size: 32px; }
+.eyebrow { color: var(--red); font-family: var(--ui-mono); font-weight: 500; }
+.chip-key { border: 2px solid var(--ink); border-radius: 4px; box-shadow: -2px 2px 0 var(--ink); }
+.lede, .about p { color: var(--ink2); font-size: 16px; }
+.about p { color: var(--ink); }
+.entry { border-bottom: 1.5px solid var(--ink); }
+.entry:last-child { border-bottom: 0; }
+.entry h3 { color: var(--ink); font-weight: 600; letter-spacing: -.02em; }
+.when { color: var(--red); font-family: var(--ui-mono); font-weight: 500; }
+.where { color: var(--ink2); }
+.entry ul { color: var(--ink); }
+.tag { background: transparent; color: var(--ink); border: 1.5px solid var(--ink); border-radius: 0; font-family: var(--ui-mono); }
+.badge, .badge.gold, .badge.pink { background: var(--ink); color: var(--page); border-radius: 0; font-family: var(--ui-mono); letter-spacing: .1em; }
+.badge { background: var(--red); color: #fff; }
+.group { color: var(--red); border-top: 2.5px solid var(--ink); font-family: var(--ui-mono); font-weight: 500; }
+.plinks a { color: var(--ink); text-decoration-color: var(--red); text-decoration-thickness: 2px; }
+.plinks a:hover { color: var(--red); }
+.skill-grid h3 { color: var(--ink2); font-family: var(--ui-mono); font-weight: 500; }
+.cert { background: var(--page); border: 2px solid var(--ink); border-radius: 0; box-shadow: 4px 4px 0 var(--ink); }
+.cert b { color: var(--red); }
+.cert small { color: var(--ink2); }
+.tl li { border-bottom: 1.5px solid var(--ink); }
+.tl span { color: var(--ink2); }
+.shot a { border: 2px solid var(--ink); border-radius: 0; background: var(--page); box-shadow: 4px 4px 0 var(--ink); }
+.shot a:hover { border-color: var(--ink); transform: translate(-1px, -1px); box-shadow: 5px 5px 0 var(--ink); }
+.shot { gap: 14px; margin-bottom: 8px; }
+.game-body iframe { background: var(--page); border-radius: 0; }
+
+/* ---------- Email dropdown ---------- */
+.mail-menu { background: var(--paper); border: 2.5px solid var(--ink); border-radius: 4px; box-shadow: 8px 8px 0 var(--ink); }
+.mail-title { color: var(--red); font-family: var(--ui-mono); font-weight: 500; }
+.mail-row { border-top: 1.5px solid var(--ink); }
+.mail-label { color: var(--ink2); font-family: var(--ui-mono); }
+.addr { color: var(--ink); font-family: var(--ui-mono); font-weight: 500; }
+.mail-status { color: #1F6B3A; font-weight: 600; }
+
+/* Focus ring that reads on cream */
+:focus-visible { outline: 3px solid var(--red); outline-offset: 3px; }

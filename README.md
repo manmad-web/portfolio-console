@@ -26,6 +26,7 @@
 
 ## Features
 
+- **Swiss Red design.** Warm cream paper, black ink and a single red, with heavy outlines and hard offset shadows on everything you press. Colours and fonts live in `assets/css/theme.css`; the snake reads its colours from the same variables.
 - **A 3D console drawn entirely in code.** The extruded graphite case, recessed key trays, copper coil hinge, countersunk screws and glass screen are inline SVG. No image assets are needed.
 - **Mechanical keycaps.** Each key is a real HTML control with a tactile face, a sidewall and a contact shadow. Keys spring up on hover, snap down when pressed and ripple in an idle wave every 7 seconds.
 - **Typing terminal.** The screen types its title one character at a time with an amber caret. Hovering or focusing a key types where that key leads. A new request always cancels unfinished typing, so text never interleaves.
@@ -61,7 +62,8 @@ portfolio-console/
 ├── index.html              Page markup, the SVG case, and the section content (<template> blocks)
 ├── assets/
 │   ├── css/
-│   │   └── styles.css      Layout, keycap 3D styling, screen typography, motion
+│   │   ├── styles.css      Layout, keycap 3D styling, screen typography, motion
+│   │   └── theme.css       The Swiss Red look: cream paper, black ink, one red, hard-shadow buttons
 │   └── js/
 │       ├── keymap.js       Every key: position, colours, label, destination, screen text
 │       ├── console.js      Builds the 3D case and keycaps; typing engine, idle wave, dialogs, email menu
@@ -125,7 +127,7 @@ Current versions of Chrome, Edge, Safari and Firefox. The site uses container qu
 ## Credits
 
 - Concept and visual brief: *The Portfolio Console* design handoff by Debbie, adapted here with my own content.
-- Typeface: [Figtree](https://fonts.google.com/specimen/Figtree) (SIL Open Font License); screen type is Courier New.
+- Typefaces: [Instrument Sans](https://fonts.google.com/specimen/Instrument+Sans) and [DM Mono](https://fonts.google.com/specimen/DM+Mono) (SIL Open Font License); the console screen uses Courier New.
 
 ## License
 
