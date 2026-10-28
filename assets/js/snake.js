@@ -21,6 +21,8 @@
   const canvas = document.getElementById('snake');
   const toggle = document.getElementById('snake-toggle');
   const counter = document.getElementById('star-count');
+  const num = document.getElementById('star-num');
+  const pauseBtn = document.getElementById('snake-pause');
   if (!canvas || !canvas.getContext) return;
   const ctx = canvas.getContext('2d');
   const reducedMq = matchMedia('(prefers-reduced-motion: reduce)');
@@ -44,6 +46,7 @@
   let len = 0, target = 0, path = [], pts = [];
   let stars = [], eaten = 0, flash = 0;
   let raf = 0, on = false, last = 0, lastMeasure = 0;
+  let userPaused = false, evading = false, speedK = 1, inside = 0;
 
   const rnd = (a, b) => a + Math.random() * (b - a);
   const TAU = Math.PI * 2;
@@ -55,13 +58,13 @@
   function stored() { try { return localStorage.getItem('portfolio-snake'); } catch (e) { return null; } }
   function remember(v) { try { localStorage.setItem('portfolio-snake', v); } catch (e) {} }
   function showCount() {
-    if (!counter) return;
-    counter.textContent = '★ ' + eaten;
-    counter.classList.remove('bump'); void counter.offsetWidth; counter.classList.add('bump');
+    if (!num) return;
+    num.textContent = '★ ' + eaten;
+    num.classList.remove('bump'); void num.offsetWidth; num.classList.add('bump');
   }
   function paused() {
     const mm = document.getElementById('mail-menu');
-    return document.hidden || !!document.querySelector('dialog[open]') || (mm && !mm.hidden);
+    return userPaused || document.hidden || !!document.querySelector('dialog[open]') || (mm && !mm.hidden);
   }
 
   /* ---------- forbidden zones ---------- */
@@ -81,7 +84,6 @@
     usable = free >= 40;
     canvas.style.visibility = usable ? '' : 'hidden';
     stars = stars.filter(s => !inText(s.x, s.y) && !(dev && inRect(s.x, s.y, dev)));
-    if (usable && inText(hx, hy)) restart();                        // text moved onto the snake: start over somewhere free
     fillStars();
   }
 
@@ -120,7 +122,7 @@
     }
     if (!p) p = { x: W / 2, y: H / 2 };
     hx = p.x; hy = p.y; theta = want = 0; moving = false;
-    len = target = 0; path = [{ x: hx, y: hy }];
+    len = target = 0; path = [{ x: hx, y: hy }]; evading = false; speedK = 1; inside = 0;
   }
 
   // Positions of the body, walking back along the path every SPACING px. Index 0 is the head.
@@ -144,16 +146,23 @@
 
   function update(dt) {
     if (!moving || !usable || !path.length) return;
-    // Turn away from text before reaching it (random side; reverse only if boxed in).
-    if (!ahead(theta, LOOK) || !ahead(want, LOOK)) {
+    // Text moved onto the snake and it cannot get out: start over somewhere free.
+    if (inText(hx, hy)) { inside += dt; if (inside > 1.5) { restart(); return; } } else inside = 0;
+    // Turn away from text before reaching it. Pick one side and stick with it until the way is clear
+    // (re-picking every frame is what made it jitter).
+    const hit = !ahead(theta, LOOK);
+    if (!evading && hit) {
       const sides = [theta + Math.PI / 2, theta - Math.PI / 2].sort(() => Math.random() - 0.5);
       const free = sides.find(a => ahead(a, LOOK * 1.6));
       want = free !== undefined ? free : theta + Math.PI;
+      evading = true;
     }
+    if (evading && !hit && Math.abs(angDiff(want, theta)) < 0.05) evading = false;
     const d = angDiff(want, theta), maxTurn = TURN * dt;
     theta += Math.abs(d) <= maxTurn ? d : Math.sign(d) * maxTurn;
-    const blocked = !ahead(theta, LOOK * 0.7);
-    const v = SPEED * (blocked ? 0.35 : 1) * dt;                     // ease off while swinging away from text
+    const goal = (hit || evading) ? 0.45 : 1;                        // ease off while swinging away from text
+    speedK += (goal - speedK) * Math.min(1, dt * 5);
+    const v = SPEED * speedK * dt;
     hx += Math.cos(theta) * v; hy += Math.sin(theta) * v;
     const lp = path[path.length - 1];
     if (Math.hypot(hx - lp.x, hy - lp.y) >= 2) path.push({ x: hx, y: hy });
@@ -202,6 +211,7 @@
     raf = requestAnimationFrame(frame);
     if (now - lastMeasure > 500) { lastMeasure = now; measure(); }   // pick up layout changes and the email menu
     const dt = Math.min((now - last) / 1000, 0.05); last = now;
+    if (!moving && usable && path.length && inText(hx, hy)) restart();   // idle head: just place it somewhere free
     if (!paused()) update(dt);
     pts = sample();
     // Running into itself only trims the tail.
@@ -229,7 +239,26 @@
   }
   if (toggle) toggle.addEventListener('click', () => setOn(!on, true));
 
+  /* ---------- pause / play ---------- */
+  function setPaused(p) {
+    userPaused = p;
+    if (pauseBtn) {
+      pauseBtn.setAttribute('aria-pressed', String(p));
+      pauseBtn.setAttribute('aria-label', p ? 'Resume the snake' : 'Pause the snake');
+      pauseBtn.title = p ? 'Play (P)' : 'Pause (P)';
+    }
+  }
+  if (pauseBtn) pauseBtn.addEventListener('click', () => setPaused(!userPaused));
+
   /* ---------- arrow keys ---------- */
+  document.addEventListener('keydown', e => {
+    if (e.key !== 'p' && e.key !== 'P') return;
+    if (!on || e.altKey || e.ctrlKey || e.metaKey || e.repeat) return;
+    if (document.querySelector('dialog[open]')) return;
+    const t = e.target;
+    if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))) return;
+    setPaused(!userPaused);
+  });
   const ANGLE = { ArrowRight: 0, ArrowDown: Math.PI / 2, ArrowLeft: Math.PI, ArrowUp: -Math.PI / 2 };
   document.addEventListener('keydown', e => {
     const a = ANGLE[e.key];
@@ -241,7 +270,7 @@
     const t = e.target;
     if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))) return;
     e.preventDefault();
-    if (e.repeat) return;
+    if (e.repeat || userPaused) return;
     if (!ahead(a, LOOK * 2)) return;                                 // never turn toward text
     if (!moving) { moving = true; theta = want = a; return; }        // the first press sets it off
     if (Math.abs(angDiff(a, want)) > Math.PI - 0.2) return;          // no instant U-turn

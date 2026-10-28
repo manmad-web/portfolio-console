@@ -288,8 +288,17 @@ button.talk { font: inherit; font-size: 14px; font-weight: 600; color: inherit; 
 .linkish:hover { color: var(--cream); }
 
 /* Star counter under Let's Talk */
-.star-count { position: absolute; right: 6px; top: calc(100% + 2px); font-family: var(--mono); font-size: 20px; font-weight: 700; line-height: 1; letter-spacing: .04em; color: var(--amber); font-variant-numeric: tabular-nums; pointer-events: none; }
+.star-count { display: flex; align-items: center; gap: 8px; position: absolute; right: 6px; top: calc(100% + 2px); font-family: var(--mono); font-size: 20px; font-weight: 700; line-height: 1; letter-spacing: .04em; color: var(--amber); font-variant-numeric: tabular-nums; pointer-events: none; }
 .star-count[hidden] { display: none; }
-.star-count.bump { animation: bump 320ms cubic-bezier(.22,1.5,.4,1); }
+.star-count button { pointer-events: auto; }
+#star-num { display: inline-block; }
+#star-num.bump { animation: bump 320ms cubic-bezier(.22,1.5,.4,1); }
 @keyframes bump { 0% { transform: scale(1); } 40% { transform: scale(1.35); } 100% { transform: scale(1); } }
-@media (prefers-reduced-motion: reduce) { .star-count.bump { animation: none; } }
+@media (prefers-reduced-motion: reduce) { #star-num.bump { animation: none; } }
+
+.pp { display: inline-grid; place-items: center; width: 24px; height: 24px; padding: 0; color: var(--cream); background: #1b1b1f; border: 1px solid var(--line); border-radius: 50%; cursor: pointer; }
+.pp:hover { border-color: var(--orange); }
+.pp .i-play { display: none; }
+.pp[aria-pressed="true"] .i-pause { display: none; }
+.pp[aria-pressed="true"] .i-play { display: block; }
+.pp[aria-pressed="true"] { border-color: var(--orange); color: var(--orange); }
