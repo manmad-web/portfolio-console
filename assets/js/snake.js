@@ -26,6 +26,8 @@
   if (!canvas || !canvas.getContext) return;
   const ctx = canvas.getContext('2d');
   const reducedMq = matchMedia('(prefers-reduced-motion: reduce)');
+  // Phones and touch tablets have no arrow keys: the snake, stars, counter and pause button stay off.
+  const phoneMq = matchMedia('(max-width: 820px), (hover: none) and (pointer: coarse)');
 
   const SPEED = 80;              // px per second: slow and steady
   const TURN = 5;                // radians per second the head can swing (turns curve)
@@ -234,6 +236,7 @@
 
   /* ---------- on / off ---------- */
   function setOn(v, save) {
+    if (phoneMq.matches) { v = false; save = false; }
     on = v;
     canvas.hidden = !v;
     if (counter) counter.hidden = !v;
@@ -294,5 +297,7 @@
   readTheme();
   resize();
   const pref = stored();
-  setOn(pref ? pref === 'on' : !reducedMq.matches, false);
+  const wanted = () => (stored() ? stored() === 'on' : !reducedMq.matches);
+  setOn(wanted(), false);
+  phoneMq.addEventListener('change', () => setOn(wanted(), false));      // resized or rotated across the phone breakpoint
 })();
