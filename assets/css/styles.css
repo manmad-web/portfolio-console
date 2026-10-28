@@ -15,6 +15,7 @@
   --amber: #F8A91F;
   --orange: #EC6426;
   --pink: #E4A5CA;
+  --blue: #5AA9FF;
   --leaf: #72AC43;
   --brown: #66271B;
   --sans: "Figtree", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -59,9 +60,9 @@ nav.main button:hover { color: var(--text); background: #1d1d21; }
 .avail { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 500; color: var(--muted); border: 1px solid var(--line); border-radius: 999px; padding: 6px 14px; }
 .avail i { width: 8px; height: 8px; border-radius: 50%; background: var(--leaf); box-shadow: 0 0 0 3px rgba(114,172,67,.18); }
 .intro h1 { margin: 0; font-size: clamp(38px, 6vw, 68px); line-height: 1.02; letter-spacing: -.035em; font-weight: 800; text-wrap: balance; }
-.name-btn { font: inherit; color: var(--pink); background: none; border: 0; padding: 0; cursor: text; border-bottom: 2px dashed transparent; letter-spacing: inherit; }
-.name-btn:hover { border-bottom-color: rgba(228,165,202,.45); }
-.name-input { font: inherit; letter-spacing: inherit; color: var(--pink); background: #1b1b1f; border: 1px solid var(--pink); border-radius: 10px; width: 7ch; padding: 0 .15em; line-height: 1; }
+.name-btn { font: inherit; color: var(--blue); background: none; border: 0; padding: 0; cursor: text; border-bottom: 2px dashed transparent; letter-spacing: inherit; }
+.name-btn:hover { border-bottom-color: rgba(90,169,255,.5); }
+.name-input { font: inherit; letter-spacing: inherit; color: var(--blue); background: #1b1b1f; border: 1px solid var(--blue); border-radius: 10px; width: 7ch; padding: 0 .15em; line-height: 1; }
 .intro p { margin: 0; max-width: 56ch; color: var(--muted); font-size: clamp(16px, 1.6vw, 19px); text-wrap: balance; }
 
 /* ---------- Device ---------- */
