@@ -31,9 +31,8 @@
 - **Typing terminal.** The screen types its title one character at a time with an amber caret. Hovering or focusing a key types where that key leads. A new request always cancels unfinished typing, so text never interleaves.
 - **Section dialogs.** A native modal `<dialog>` handles Escape to close, click-outside to close, focus trapping and focus return to the key that opened it.
 - **One shared coordinate system.** The case, wells, keys and screen all live on a single 1536 × 1024 artboard, so they scale together and never drift apart at any viewport width.
-- **Background snake.** A translucent mint snake plays itself across the whole screen behind the content, eating star prizes and growing. The arrow keys take over and it returns to autoplay after a few seconds. It never dies, never blocks clicks, and a footer toggle turns it off. It starts off for visitors who prefer reduced motion.
+- **Background snake.** A translucent mint snake plays itself across the whole screen behind the content, eating star prizes and growing. The arrow keys take over, and it returns to autoplay after 15 seconds without a key press. It never dies, never blocks clicks, and a footer toggle turns it off. It starts off for visitors who prefer reduced motion.
 - **Email dropdown.** The header email icon, Let's Talk and the contact keys open one menu with two addresses. Each has an Open in mail app link and a Copy button.
-- **Voice intro.** A Hear intro chip speaks a short introduction using the browser's built-in speech synthesis. It starts only when tapped, never automatically.
 - **Game slot.** A Take a break button opens an offline game in a dialog once `window.PORTFOLIO_GAME` is set in `assets/js/keymap.js`. It stays hidden until then.
 - **Lightweight.** Plain HTML, CSS and JavaScript, with no framework and no build step. The only external request is the Figtree font from Google Fonts.
 
@@ -65,7 +64,7 @@ portfolio-console/
 │   │   └── styles.css      Layout, keycap 3D styling, screen typography, motion
 │   └── js/
 │       ├── keymap.js       Every key: position, colours, label, destination, screen text
-│       ├── console.js      Builds the 3D case and keycaps; typing engine, idle wave, dialogs, email menu, voice
+│       ├── console.js      Builds the 3D case and keycaps; typing engine, idle wave, dialogs, email menu
 │       └── snake.js        The background snake game
 ├── docs/
 │   ├── design-notes.md     Coordinate system, key fit table and motion spec
@@ -98,7 +97,6 @@ To publish a fork, go to **Settings → Pages**, choose **Deploy from a branch**
 | Key labels, colours, screen text or destinations | `assets/js/keymap.js` |
 | The welcome line on the screen | `showWelcome()` in `assets/js/console.js` |
 | Email addresses | The `#mail-menu` block in `index.html` |
-| Voice script | `SCRIPT` in `assets/js/console.js` |
 | The game | `window.PORTFOLIO_GAME` in `assets/js/keymap.js`, with the game files in `games/<name>/` |
 
 The name in the "Hi, I'm Manish" heading can be clicked and edited by a visitor. That edit is saved only in their own browser through `localStorage`. It never changes the published site.

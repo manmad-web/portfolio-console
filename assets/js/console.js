@@ -264,31 +264,7 @@
     catch (err) { fallback(); }
   });
 
-  /* ---------- 9. Voice intro (starts only when tapped; browsers block autoplay audio) ---------- */
-  const voiceBtn = $('voice'), voiceLabel = $('voice-label');
-  if ('speechSynthesis' in window && 'SpeechSynthesisUtterance' in window) {
-    voiceBtn.hidden = false;
-    const SCRIPT = "Hi, I'm Manish. I'm a computer science student at S F U, building A I agents, evaluations and red-teaming tools. Press the keys on the console to explore my work.";
-    const setVoice = on => { voiceBtn.setAttribute('aria-pressed', String(on)); voiceLabel.textContent = on ? 'Stop' : 'Hear intro'; };
-    const stopVoice = () => { speechSynthesis.cancel(); setVoice(false); };
-    voiceBtn.addEventListener('click', () => {
-      if (speechSynthesis.speaking) { stopVoice(); showWelcome(); return; }
-      const u = new SpeechSynthesisUtterance(SCRIPT);
-      const en = speechSynthesis.getVoices().filter(v => /^en/i.test(v.lang));
-      u.voice = en.find(v => /en-(CA|US|GB)/i.test(v.lang) && v.localService) || en[0] || null;
-      u.lang = (u.voice && u.voice.lang) || 'en-US';
-      u.rate = 1; u.pitch = 1;
-      u.onend = u.onerror = () => { setVoice(false); showWelcome(); };
-      setVoice(true);
-      typeTo("Hi, I'm Manish.", 'Press the keys to explore my work.', 60);
-      speechSynthesis.cancel();
-      speechSynthesis.speak(u);
-    });
-    document.addEventListener('visibilitychange', () => { if (document.hidden) stopVoice(); });
-    window.addEventListener('pagehide', stopVoice);
-  }
-
-  /* ---------- 10. Game slot (set window.PORTFOLIO_GAME in keymap.js to show the button) ---------- */
+  /* ---------- 9. Game slot (set window.PORTFOLIO_GAME in keymap.js to show the button) ---------- */
   const game = window.PORTFOLIO_GAME;
   if (game && game.src) {
     const gameDlg = $('game-dialog'), gameFrame = $('game-frame'), gameBtn = $('game-btn');

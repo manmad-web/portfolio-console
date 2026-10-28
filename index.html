@@ -17,7 +17,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap">
-  <link rel="stylesheet" href="assets/css/styles.css?v=5">
+  <link rel="stylesheet" href="assets/css/styles.css?v=7">
 </head>
 <body>
 <canvas id="snake" aria-hidden="true"></canvas>
@@ -55,7 +55,6 @@
     <section class="intro" aria-labelledby="hello">
       <div class="intro-row">
         <span class="avail"><i aria-hidden="true"></i>Now: AI Analyst Co-op, Government of BC</span>
-        <button type="button" class="chip" id="voice" aria-pressed="false" hidden><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z"/><path d="M15.5 9a4 4 0 010 6M18 6.5a7.5 7.5 0 010 11"/></svg><span id="voice-label">Hear intro</span></button>
         <button type="button" class="chip" id="game-btn" aria-haspopup="dialog" hidden><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="7" width="19" height="11" rx="5"/><path d="M7.5 10.5v4M5.5 12.5h4"/><circle cx="16" cy="11.5" r=".8" fill="currentColor"/><circle cx="18" cy="13.5" r=".8" fill="currentColor"/></svg><span>Take a break</span></button>
       </div>
       <h1 id="hello">Hi, I'm <button type="button" class="name-btn" id="name-btn" aria-label="Edit display name, currently Manish">Manish</button></h1>
@@ -170,7 +169,7 @@
 
   <footer>
     <span>Manish Madishetty · Vancouver, Canada</span>
-    <span><button type="button" class="linkish" id="snake-toggle" aria-pressed="true" title="Arrow keys steer the snake">Snake: on</button> · <a href="https://github.com/manmad-web" target="_blank" rel="noopener">GitHub</a> · <a href="https://www.linkedin.com/in/manishmadishetty" target="_blank" rel="noopener">LinkedIn</a> · Press any key.</span>
+    <span><button type="button" class="linkish" id="snake-toggle" aria-pressed="true" title="Arrow keys steer the snake">Snake: on (use arrow keys)</button> · <a href="https://github.com/manmad-web" target="_blank" rel="noopener">GitHub</a> · <a href="https://www.linkedin.com/in/manishmadishetty" target="_blank" rel="noopener">LinkedIn</a> · Press any key.</span>
   </footer>
 </div>
 
@@ -457,8 +456,8 @@
 </template>
 
 
-<script src="assets/js/keymap.js?v=5"></script>
-<script src="assets/js/console.js?v=5"></script>
-<script src="assets/js/snake.js?v=5"></script>
+<script src="assets/js/keymap.js?v=7"></script>
+<script src="assets/js/console.js?v=7"></script>
+<script src="assets/js/snake.js?v=8"></script>
 </body>
 </html>

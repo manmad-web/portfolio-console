@@ -5,7 +5,7 @@
    the canvas sits under the page and ignores the mouse.
 
    - Runs by itself all the time (it steers toward the nearest prize).
-   - Arrow keys take over. After a few seconds without input it goes
+   - Arrow keys take over. After a while without input it goes
      back to playing itself.
    - Eating a prize makes it longer. It never dies: running into itself
      just trims its tail, so it can keep going forever.
@@ -20,17 +20,17 @@
   const reducedMq = matchMedia('(prefers-reduced-motion: reduce)');
 
   const CELL = 24;               // grid size in CSS pixels
-  const TICK = 105;              // ms per step
-  const USER_HOLD = 5000;        // ms the arrow keys keep control
+  const TICK = 230;              // ms per step (slow and relaxed)
+  const USER_HOLD = 15000;       // ms the arrow keys keep control after the last press
   const START_LEN = 7;
-  const GROW = 2;                // segments gained per prize
+  const GROW = 3;                // segments gained per prize
   const SNAKE = [92, 225, 200];  // mint, clearly different from the warm page palette
   const PRIZES = ['#EC6426', '#F8A91F', '#E4A5CA', '#FDE3CF', '#72AC43'];
 
   let cols = 0, rows = 0, dpr = 1;
   let snake = [], dir = { x: 1, y: 0 }, queued = null, growth = 0;
   let prizes = [];
-  let lastInput = -Infinity, acc = 0, last = 0, raf = 0, on = false, eaten = 0;
+  let lastInput = -Infinity, acc = 0, last = 0, raf = 0, on = false, eaten = 0, flash = 0, queue2 = null;
 
   const wrap = (v, n) => (v % n + n) % n;
   const same = (a, b) => a.x === b.x && a.y === b.y;
@@ -102,10 +102,10 @@
   function step(now) {
     const userControl = now - lastInput < USER_HOLD;
     let d = null;
-    if (userControl && queued) d = queued;
+    if (userControl && queued) { d = queued; queued = queue2; queue2 = null; }
     else if (!userControl) d = autoSteer();
     else d = dir;
-    queued = null;
+    if (!userControl) { queued = null; queue2 = null; }
     if (!d) { snake.length = Math.max(START_LEN, Math.floor(snake.length / 2)); d = dir; }   // boxed in: trim and keep going
     dir = d;
     const head = { x: wrap(snake[0].x + dir.x, cols), y: wrap(snake[0].y + dir.y, rows) };
@@ -113,7 +113,7 @@
     if (bite > 0) snake.length = Math.max(START_LEN, bite);                                   // never dies, just trims
     snake.unshift(head);
     const pi = prizes.findIndex(p => same(p, head));
-    if (pi >= 0) { prizes.splice(pi, 1); growth += GROW; eaten++; fillPrizes(); }
+    if (pi >= 0) { prizes.splice(pi, 1); growth += GROW; eaten++; flash = performance.now(); fillPrizes(); }
     if (growth > 0) growth--; else snake.pop();
   }
 
@@ -137,14 +137,15 @@
     const n = snake.length;
     for (let i = n - 1; i >= 0; i--) {
       const s = snake[i], k = 1 - i / n;
-      const r = CELL * (0.28 + 0.2 * k);
+      const r = CELL * (0.3 + 0.22 * k);
       ctx.beginPath();
       ctx.arc(s.x * CELL + CELL / 2, s.y * CELL + CELL / 2, r, 0, 6.2832);
       ctx.fillStyle = `rgba(${SNAKE[0]},${SNAKE[1]},${SNAKE[2]},${(0.22 + 0.4 * k).toFixed(3)})`;
       ctx.fill();
     }
     const h = snake[0], hx = h.x * CELL + CELL / 2, hy = h.y * CELL + CELL / 2;
-    ctx.beginPath(); ctx.arc(hx, hy, CELL * 0.5, 0, 6.2832);
+    const pop = Math.max(0, 1 - (t - flash) / 450);
+    ctx.beginPath(); ctx.arc(hx, hy, CELL * (0.5 + 0.22 * pop), 0, 6.2832);
     ctx.fillStyle = `rgba(${SNAKE[0]},${SNAKE[1]},${SNAKE[2]},0.7)`; ctx.shadowColor = `rgb(${SNAKE[0]},${SNAKE[1]},${SNAKE[2]})`; ctx.shadowBlur = 14; ctx.fill();
     ctx.shadowBlur = 0; ctx.fillStyle = 'rgba(10,20,18,.85)';
     const px = -dir.y * CELL * 0.16, py = dir.x * CELL * 0.16, fx = dir.x * CELL * 0.14, fy = dir.y * CELL * 0.14;
@@ -162,7 +163,7 @@
   function setOn(v, save) {
     on = v;
     canvas.hidden = !v;
-    if (toggle) { toggle.setAttribute('aria-pressed', String(v)); toggle.textContent = v ? 'Snake: on' : 'Snake: off'; }
+    if (toggle) { toggle.setAttribute('aria-pressed', String(v)); toggle.textContent = v ? 'Snake: on (use arrow keys)' : 'Snake: off'; }
     if (save) remember(v ? 'on' : 'off');
     cancelAnimationFrame(raf);
     if (v) {
@@ -186,8 +187,10 @@
     const t = e.target;
     if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))) return;
     e.preventDefault();
-    if (d.x === -dir.x && d.y === -dir.y) return;          // no instant U-turns
-    queued = d; lastInput = performance.now();
+    const base = queued || dir;
+    if (d.x === -base.x && d.y === -base.y) return;
+    if (!queued) queued = d; else queue2 = d;                 // remember a second quick press
+    lastInput = performance.now();
   });
 
   /* ---------- boot ---------- */
