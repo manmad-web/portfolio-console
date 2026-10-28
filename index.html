@@ -17,9 +17,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap">
-  <link rel="stylesheet" href="assets/css/styles.css?v=4">
+  <link rel="stylesheet" href="assets/css/styles.css?v=5">
 </head>
 <body>
+<canvas id="snake" aria-hidden="true"></canvas>
 <div class="wrap">
   <header class="top">
     <a class="mark" href="#top" aria-label="manish, home">manish<span>.</span></a>
@@ -169,7 +170,7 @@
 
   <footer>
     <span>Manish Madishetty · Vancouver, Canada</span>
-    <span><a href="https://github.com/manmad-web" target="_blank" rel="noopener">GitHub</a> · <a href="https://www.linkedin.com/in/manishmadishetty" target="_blank" rel="noopener">LinkedIn</a> · Built as a portfolio console. Press any key.</span>
+    <span><button type="button" class="linkish" id="snake-toggle" aria-pressed="true" title="Arrow keys steer the snake">Snake: on</button> · <a href="https://github.com/manmad-web" target="_blank" rel="noopener">GitHub</a> · <a href="https://www.linkedin.com/in/manishmadishetty" target="_blank" rel="noopener">LinkedIn</a> · Press any key.</span>
   </footer>
 </div>
 
@@ -253,7 +254,8 @@
       <span class="badge gold">1st Place</span>
       <div class="entry-top"><h3>Chang Institute Catalyst Challenge</h3><span class="when">Aug 2025 – Nov 2025</span></div>
       <div class="where">SFU Charles Chang Institute for Entrepreneurship</div>
-      <ul>
+      <div class="shot"><a href="assets/img/catalyst-certificate.jpg" target="_blank" rel="noopener"><img src="assets/img/catalyst-certificate.jpg" alt="First place certificate for Manish from the Chang Institute Catalyst Fall 2025 Entrepreneurship Challenge, dated November 19, 2025." loading="lazy" decoding="async" width="1400" height="1000"></a></div>
+    <ul>
         <li>Designed and prototyped Moment Intelligence, an AI-powered React supplier discovery dashboard for Moment Energy with supplier scoring cards, component and region filters, and a real-time trade intelligence feed.</li>
         <li>Designed the vendor database schema and a multi-agent RAG pipeline with LangChain and n8n to crawl, vectorize and retrieve supplier profiles, compliance records and product specs.</li>
         <li>Pitched directly to Moment Energy's CEO and COO; both expressed interest in enterprise deployment.</li>
@@ -263,7 +265,8 @@
       <span class="badge pink">People's Choice</span>
       <div class="entry-top"><h3>UI/UX People's Choice Award, AskSFU</h3><span class="when">Sept 2025</span></div>
       <div class="where">SFU Faculty of Applied Sciences</div>
-      <ul>
+      <div class="shot"><a href="assets/img/asksfu-showcase.jpg" target="_blank" rel="noopener"><img src="assets/img/asksfu-showcase.jpg" alt="The AskSFU team at the SFU CMPT 363/863 project showcase, with a banner congratulating the People's Choice Award winner." loading="lazy" decoding="async" width="1400" height="809"></a></div>
+    <ul>
         <li>Engineered and productized SFU's first AI-powered student support chatbot with Python, LangChain and GPT-4; compared vector RAG and GraphRAG configurations and deployed to end users.</li>
         <li>Designed responsive, accessible UI components; featured on the Faculty of Applied Sciences Computing Showcase website.</li>
       </ul>
@@ -272,7 +275,8 @@
       <span class="badge">2nd Runner-up</span>
       <div class="entry-top"><h3>Chang Institute Top Idea Prize, ZENJI</h3><span class="when">April 2026</span></div>
       <div class="where">SFU Charles Chang Institute for Entrepreneurship</div>
-      <ul>
+      <div class="shot"><a href="assets/img/zenji-bottle.jpg" target="_blank" rel="noopener"><img src="assets/img/zenji-bottle.jpg" alt="The ZENJI zero-sugar fermented gut-health drink bottle on a cream background with red spheres and a carrot." loading="lazy" decoding="async" width="1400" height="786"></a></div>
+    <ul>
         <li>Placed in a university-wide venture competition for ZENJI, a zero-sugar fermented gut-health beverage that upcycles imperfect produce, validated through market sizing, unit economics and competitive positioning in functional drinks.</li>
       </ul>
     </article>
@@ -329,7 +333,7 @@
     <span class="badge pink">People's Choice</span>
     <div class="entry-top"><h3>AskSFU</h3><span class="when">Sept 2025</span></div>
     <div class="where">SFU's first AI-powered student support chatbot · CMPT 363 Team 7</div>
-    <div class="shot"><a href="assets/img/asksfu-poster.jpg" target="_blank" rel="noopener"><img src="assets/img/asksfu-poster.jpg" alt="The AskSFU poster: motivation, RAG chatbot architecture, results and the chatbot interface." loading="lazy" decoding="async" width="1125" height="634"></a></div>
+    <div class="shot two"><a href="assets/img/asksfu-poster.jpg" target="_blank" rel="noopener"><img src="assets/img/asksfu-poster.jpg" alt="The AskSFU poster: motivation, RAG chatbot architecture, results and the chatbot interface." loading="lazy" decoding="async" width="1125" height="634"></a><a href="assets/img/asksfu-showcase.jpg" target="_blank" rel="noopener"><img src="assets/img/asksfu-showcase.jpg" alt="The AskSFU team at the SFU CMPT 363/863 project showcase, with a banner congratulating the People's Choice Award winner." loading="lazy" decoding="async" width="1400" height="809"></a></div>
     <ul>
       <li>Answers questions on courses, professors, clubs and campus maps, and reads an uploaded schedule or transcript (GPT-4o Vision) to suggest courses and open time slots.</li>
       <li>Compared vector RAG and GraphRAG pipelines. It stays on SFU topics and avoids sensitive questions.</li>
@@ -342,7 +346,7 @@
     <span class="badge gold">1st Place</span>
     <div class="entry-top"><h3>Moment Intelligence</h3><span class="when">Aug – Nov 2025</span></div>
     <div class="where">Chang Institute Catalyst Challenge · With Gowtam and Mahidhar</div>
-    <div class="shot two"><a href="assets/img/moment-trade-pulse.jpg" target="_blank" rel="noopener"><img src="assets/img/moment-trade-pulse.jpg" alt="Moment Intelligence Trade Pulse screen showing global news cards with market impact and severity tags." loading="lazy" decoding="async" width="1125" height="634"></a><a href="assets/img/moment-supplier.jpg" target="_blank" rel="noopener"><img src="assets/img/moment-supplier.jpg" alt="Moment Intelligence supplier profile with compliance status, risk assessment and an overall score of 87 out of 100." loading="lazy" decoding="async" width="1125" height="634"></a></div>
+    <div class="shot two"><a href="assets/img/moment-trade-pulse.jpg" target="_blank" rel="noopener"><img src="assets/img/moment-trade-pulse.jpg" alt="Moment Intelligence Trade Pulse screen showing global news cards with market impact and severity tags." loading="lazy" decoding="async" width="1125" height="634"></a><a href="assets/img/moment-supplier.jpg" target="_blank" rel="noopener"><img src="assets/img/moment-supplier.jpg" alt="Moment Intelligence supplier profile with compliance status, risk assessment and an overall score of 87 out of 100." loading="lazy" decoding="async" width="1125" height="634"></a><a href="assets/img/catalyst-certificate.jpg" target="_blank" rel="noopener"><img src="assets/img/catalyst-certificate.jpg" alt="First place certificate for Manish from the Chang Institute Catalyst Fall 2025 Entrepreneurship Challenge, dated November 19, 2025." loading="lazy" decoding="async" width="1400" height="1000"></a></div>
     <ul>
       <li>An AI supplier discovery dashboard for Moment Energy. It targets manual supplier search, the FEOC compliance black hole and the technical translation gap with compliant-supplier discovery, risk scoring and market intelligence.</li>
       <li>Multi-agent RAG pipeline that crawls, vectorizes and retrieves supplier profiles, compliance records and specs. Pitched to the CEO and COO.</li>
@@ -363,6 +367,7 @@
   <article class="entry">
     <span class="badge">2nd Runner-up</span>
     <div class="entry-top"><h3>ZENJI</h3><span class="when">April 2026</span></div>
+    <div class="shot"><a href="assets/img/zenji-bottle.jpg" target="_blank" rel="noopener"><img src="assets/img/zenji-bottle.jpg" alt="The ZENJI zero-sugar fermented gut-health drink bottle on a cream background with red spheres and a carrot." loading="lazy" decoding="async" width="1400" height="786"></a></div>
     <ul><li>A zero-sugar synbiotic gut-health drink that upcycles imperfect produce, validated through market sizing, unit economics and competitive positioning. Chang Institute Top Idea Prize.</li></ul>
     <div class="tags"><span class="tag">Venture</span><span class="tag">Unit economics</span><span class="tag">Market sizing</span></div>
   </article>
@@ -452,7 +457,8 @@
 </template>
 
 
-<script src="assets/js/keymap.js?v=4"></script>
-<script src="assets/js/console.js?v=4"></script>
+<script src="assets/js/keymap.js?v=5"></script>
+<script src="assets/js/console.js?v=5"></script>
+<script src="assets/js/snake.js?v=5"></script>
 </body>
 </html>
