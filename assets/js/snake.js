@@ -1,16 +1,17 @@
 /* ==========================================================================
    Portfolio Console — background snake
-   A translucent snake plays itself behind the page, eating little star
-   prizes scattered over the screen.
+   A translucent snake glides behind the page and eats little star prizes.
 
-   - Forbidden zones: every piece of text, the header, the console and the
-     email menu are off limits. Neither the snake nor a prize can enter
-     them, so the content is never covered. The zones are measured from the
-     real page and re-measured as it changes.
    - Like the classic game: it waits as just a head until your first arrow
-     press, then keeps moving forward by itself. The arrow keys only turn it.
-     It moves slowly and glides between cells. It never plays itself.
-   - It can never be steered into a forbidden zone (text, header, console).
+     press, then keeps gliding forward by itself. The arrow keys only turn
+     it. It never plays itself.
+   - Motion is continuous (no grid steps): constant slow speed, with turns
+     that curve instead of snapping.
+   - Forbidden zones: the header, the "Hi, I'm Manish" greeting, every line
+     of text, the footer, the email menu and open dialogs. Neither the snake
+     nor a prize can enter them, and the snake turns away before it gets
+     there. The console is the one exception: the snake may glide behind it
+     (prizes are kept off it so every one stays visible).
    - Eating a prize makes it longer and adds to the star counter under
      Let's Talk. It never dies: running into itself just trims its tail.
    - Off by default for visitors who prefer reduced motion. A footer button
@@ -24,141 +25,146 @@
   const ctx = canvas.getContext('2d');
   const reducedMq = matchMedia('(prefers-reduced-motion: reduce)');
 
-  const CELL = 24;               // grid size in CSS pixels
-  const TICK = 320;              // ms per step: slow and steady
-  const GROW = 3;                // segments gained per prize
+  const SPEED = 80;              // px per second: slow and steady
+  const TURN = 5;                // radians per second the head can swing (turns curve)
+  const SPACING = 15;            // px between body segments
+  const GROW = 60;               // px of length gained per prize
+  const GROW_RATE = 70;          // px per second the body lengthens after eating
+  const LOOK = 22;               // how far ahead the snake checks for text
   const MARGIN = 14;             // px of breathing room kept around text
+  const EAT = 20;                // px reach for eating a prize
   const SNAKE = [92, 225, 200];  // mint, clearly different from the warm page palette
   const PRIZES = ['#EC6426', '#F8A91F', '#E4A5CA', '#FDE3CF', '#72AC43'];
-  // Everything that carries content. Measured live, so edits to the page are picked up.
-  const ZONES = ['.mark', 'nav.main', '.hdr-right', '.intro-row', '.intro h1', '.intro p',
-                 '#device', 'footer span', '#mail-menu', '.star-count', 'dialog[open]'];
+  // Anything with words on it. Measured live, so edits to the page are picked up.
+  const TEXT = ['.mark', 'nav.main', '.hdr-right', '.intro-row', '.intro h1', '.intro p',
+                'footer span', '#mail-menu', '.star-count', 'dialog[open]'];
 
-  let cols = 0, rows = 0, dpr = 1, wall = new Uint8Array(0), freeCount = 0, usable = true;
-  let snake = [], dir = { x: 1, y: 0 }, growth = 0;
-  let prizes = [];
-  let moving = false, queued = null, queue2 = null, acc = 0, last = 0, raf = 0, on = false, eaten = 0, flash = 0, rpos = [], lastDraw = 0;
+  let W = 0, H = 0, dpr = 1, textRects = [], dev = null, usable = true;
+  let hx = 0, hy = 0, theta = 0, want = 0, moving = false;
+  let len = 0, target = 0, path = [], pts = [];
+  let stars = [], eaten = 0, flash = 0;
+  let raf = 0, on = false, last = 0, lastMeasure = 0;
 
-  const wrap = (v, n) => (v % n + n) % n;
-  const same = (a, b) => a.x === b.x && a.y === b.y;
-  const hits = (cell, skipTail) => snake.some((s, i) => !(skipTail && i === snake.length - 1) && same(s, cell));
-  const rnd = n => Math.floor(Math.random() * n);
-  const idx = c => c.y * cols + c.x;
-  const center = c => ({ x: c.x * CELL + CELL / 2, y: c.y * CELL + CELL / 2 });
-  const syncR = () => { rpos = snake.map(center); };      // snap the drawn snake onto its cells
-  const isWall = c => wall[idx(c)] === 1;
+  const rnd = (a, b) => a + Math.random() * (b - a);
+  const TAU = Math.PI * 2;
+  const angDiff = (a, b) => { let d = (a - b) % TAU; if (d > Math.PI) d -= TAU; if (d < -Math.PI) d += TAU; return d; };
+  const inRect = (x, y, r) => x > r.l && x < r.r && y > r.t && y < r.b;
+  const inText = (x, y) => x < 10 || y < 10 || x > W - 10 || y > H - 10 || textRects.some(r => inRect(x, y, r));
+  const ahead = (th, d) => !inText(hx + Math.cos(th) * d, hy + Math.sin(th) * d);
 
   function stored() { try { return localStorage.getItem('portfolio-snake'); } catch (e) { return null; } }
   function remember(v) { try { localStorage.setItem('portfolio-snake', v); } catch (e) {} }
-
-  /* ---------- forbidden zones ---------- */
-  function measure() {
-    const grid = new Uint8Array(cols * rows);
-    for (const sel of ZONES) {
-      document.querySelectorAll(sel).forEach(el => {
-        if (el.hidden) return;
-        const r = el.getBoundingClientRect();
-        if (r.width < 2 || r.height < 2) return;
-        const x0 = Math.max(0, Math.floor((r.left - MARGIN) / CELL)), x1 = Math.min(cols - 1, Math.floor((r.right + MARGIN) / CELL));
-        const y0 = Math.max(0, Math.floor((r.top - MARGIN) / CELL)), y1 = Math.min(rows - 1, Math.floor((r.bottom + MARGIN) / CELL));
-        for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) grid[y * cols + x] = 1;
-      });
-    }
-    wall = grid;
-    freeCount = 0; for (let i = 0; i < grid.length; i++) if (!grid[i]) freeCount++;
-    usable = freeCount >= 60;                                   // on a phone there may be no free room at all
-    canvas.style.visibility = usable ? '' : 'hidden';
-    // Anything caught inside a newly forbidden zone is moved out.
-    prizes = prizes.filter(p => !isWall(p));
-    if (snake.length && snake.some(isWall)) restart();
-    fillPrizes();
-  }
-
-  /* ---------- sizing ---------- */
-  function resize() {
-    dpr = Math.min(window.devicePixelRatio || 1, 2);
-    const w = innerWidth, h = innerHeight;
-    canvas.width = Math.round(w * dpr); canvas.height = Math.round(h * dpr);
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    cols = Math.max(8, Math.floor(w / CELL)); rows = Math.max(6, Math.floor(h / CELL));
-    prizes = prizes.filter(p => p.x < cols && p.y < rows);
-    snake = snake.filter(s => s.x < cols && s.y < rows);
-    syncR();
-    measure();
-    if (!snake.length && on) restart();
-    draw(performance.now());
-  }
-
-  /* ---------- prizes ---------- */
-  function spawn() {
-    for (let tries = 0; tries < 120; tries++) {
-      const c = { x: rnd(cols), y: rnd(rows) };
-      if (isWall(c) || hits(c) || prizes.some(p => same(p, c))) continue;
-      c.color = PRIZES[rnd(PRIZES.length)]; c.phase = Math.random() * 6.28;
-      return c;
-    }
-    return null;
-  }
-  function fillPrizes() {
-    if (!usable) return;
-    const want = Math.min(12, Math.floor(freeCount / 35));
-    while (prizes.length < want) { const p = spawn(); if (!p) break; prizes.push(p); }
-  }
-
-  /* ---------- game ---------- */
-  // Start (or restart) from a random free cell; the snake grows to full length as it moves.
-  function restart() {
-    let c = null;
-    for (let tries = 0; tries < 300 && !c; tries++) { const t = { x: rnd(cols), y: rnd(rows) }; if (!isWall(t)) c = t; }
-    snake = c ? [c] : [];
-    syncR();
-    growth = 0; dir = { x: 1, y: 0 }; moving = false; queued = queue2 = null;
-  }
   function showCount() {
     if (!counter) return;
     counter.textContent = '★ ' + eaten;
     counter.classList.remove('bump'); void counter.offsetWidth; counter.classList.add('bump');
   }
-  const head = () => snake[0];
-  const nextOf = d => ({ x: wrap(head().x + d.x, cols), y: wrap(head().y + d.y, rows) });
-
-  // One step in direction d. Text areas are never entered; running into yourself only trims the tail.
-  function move(d) {
-    if (!usable || !snake.length) return;
-    const nh = nextOf(d);
-    if (isWall(nh)) return;                                          // forbidden: stay where you are
-    if (snake.length > 1 && same(nh, snake[1])) return;              // no instant U-turn onto the neck
-    dir = d;
-    const from = rpos[0] ? { x: rpos[0].x, y: rpos[0].y } : center(nh);
-    const bite = snake.findIndex((s, i) => i > 0 && same(s, nh));
-    if (bite > 0) snake.length = Math.max(1, bite);                  // never dies, just trims
-    rpos.length = snake.length;
-    snake.unshift(nh); rpos.unshift(from);
-    const pi = prizes.findIndex(p => same(p, nh));
-    if (pi >= 0) { prizes.splice(pi, 1); growth += GROW; eaten++; flash = performance.now(); showCount(); fillPrizes(); }
-    if (growth > 0) growth--; else { snake.pop(); rpos.pop(); }
-  }
-
-  // One game tick: take a queued turn if there is one, otherwise keep going straight.
-  // Text areas are never entered; when something is in the way it turns to a free side.
   function paused() {
     const mm = document.getElementById('mail-menu');
     return document.hidden || !!document.querySelector('dialog[open]') || (mm && !mm.hidden);
   }
-  function tick() {
-    if (!moving || !usable || !snake.length || paused()) return;
-    const neck = snake.length > 1 ? snake[1] : null;
-    const ok = d => open(d) && !(neck && same(nextOf(d), neck));
-    let d = null;
-    if (queued) { const q = queued; queued = queue2; queue2 = null; if (ok(q)) d = q; }
-    if (!d && ok(dir)) d = dir;
-    if (!d) {
-      const sides = [{ x: dir.y, y: -dir.x }, { x: -dir.y, y: dir.x }].sort(() => Math.random() - 0.5);
-      d = sides.find(ok) || null;
-    }
-    if (d) move(d);
+
+  /* ---------- forbidden zones ---------- */
+  function box(el, pad) {
+    const r = el.getBoundingClientRect();
+    return (r.width < 2 || r.height < 2) ? null : { l: r.left - pad, r: r.right + pad, t: r.top - pad, b: r.bottom + pad };
   }
-  const open = d => !isWall(nextOf(d));
+  function measure() {
+    const rects = [];
+    for (const sel of TEXT) document.querySelectorAll(sel).forEach(el => { if (!el.hidden) { const b = box(el, MARGIN); if (b) rects.push(b); } });
+    textRects = rects;
+    const d = document.getElementById('device');
+    dev = d ? box(d, 8) : null;
+    // Is there any real room? On a phone the content can fill the whole screen.
+    let free = 0, total = 0;
+    for (let y = 12; y < H; y += 24) for (let x = 12; x < W; x += 24) { total++; if (!inText(x, y)) free++; }
+    usable = free >= 40;
+    canvas.style.visibility = usable ? '' : 'hidden';
+    stars = stars.filter(s => !inText(s.x, s.y) && !(dev && inRect(s.x, s.y, dev)));
+    if (usable && inText(hx, hy)) restart();                        // text moved onto the snake: start over somewhere free
+    fillStars();
+  }
+
+  /* ---------- sizing ---------- */
+  function resize() {
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    W = innerWidth; H = innerHeight;
+    canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    measure();
+    if (!path.length && on) restart();
+    draw(performance.now());
+  }
+
+  /* ---------- prizes ---------- */
+  function spawnStar() {
+    for (let tries = 0; tries < 200; tries++) {
+      const x = rnd(24, W - 24), y = rnd(24, H - 24);
+      if (inText(x, y) || (dev && inRect(x, y, dev)) || stars.some(s => Math.hypot(s.x - x, s.y - y) < 70)) continue;
+      return { x, y, color: PRIZES[Math.floor(Math.random() * PRIZES.length)], phase: Math.random() * 6.28 };
+    }
+    return null;
+  }
+  function fillStars() {
+    if (!usable) return;
+    const want = Math.min(12, Math.max(3, Math.floor(W * H / 90000)));
+    while (stars.length < want) { const s = spawnStar(); if (!s) break; stars.push(s); }
+  }
+
+  /* ---------- game ---------- */
+  function restart() {
+    let p = null;
+    for (let tries = 0; tries < 300 && !p; tries++) {
+      const x = rnd(30, W - 30), y = rnd(30, H - 30);
+      if (!inText(x, y) && !(dev && inRect(x, y, dev))) p = { x, y };
+    }
+    if (!p) p = { x: W / 2, y: H / 2 };
+    hx = p.x; hy = p.y; theta = want = 0; moving = false;
+    len = target = 0; path = [{ x: hx, y: hy }];
+  }
+
+  // Positions of the body, walking back along the path every SPACING px. Index 0 is the head.
+  function sample() {
+    const out = [{ x: hx, y: hy }];
+    let need = SPACING, acc = 0, keep = 0;
+    for (let i = path.length - 1; i > 0; i--) {
+      const a = path[i], b = path[i - 1], seg = Math.hypot(a.x - b.x, a.y - b.y);
+      keep = i - 1;
+      while (acc + seg >= need && need <= len + 0.01) {
+        const t = (need - acc) / seg;
+        out.push({ x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t });
+        need += SPACING;
+      }
+      acc += seg;
+      if (acc > len + SPACING * 2) break;
+    }
+    if (keep > 0) path.splice(0, keep);                              // forget the path behind the tail
+    return out;
+  }
+
+  function update(dt) {
+    if (!moving || !usable || !path.length) return;
+    // Turn away from text before reaching it (random side; reverse only if boxed in).
+    if (!ahead(theta, LOOK) || !ahead(want, LOOK)) {
+      const sides = [theta + Math.PI / 2, theta - Math.PI / 2].sort(() => Math.random() - 0.5);
+      const free = sides.find(a => ahead(a, LOOK * 1.6));
+      want = free !== undefined ? free : theta + Math.PI;
+    }
+    const d = angDiff(want, theta), maxTurn = TURN * dt;
+    theta += Math.abs(d) <= maxTurn ? d : Math.sign(d) * maxTurn;
+    const blocked = !ahead(theta, LOOK * 0.7);
+    const v = SPEED * (blocked ? 0.35 : 1) * dt;                     // ease off while swinging away from text
+    hx += Math.cos(theta) * v; hy += Math.sin(theta) * v;
+    const lp = path[path.length - 1];
+    if (Math.hypot(hx - lp.x, hy - lp.y) >= 2) path.push({ x: hx, y: hy });
+    if (len < target) len = Math.min(target, len + GROW_RATE * dt);
+    // Eat prizes.
+    for (let i = stars.length - 1; i >= 0; i--) {
+      if (Math.hypot(stars[i].x - hx, stars[i].y - hy) < EAT) {
+        stars.splice(i, 1); target += GROW; eaten++; flash = performance.now(); showCount(); fillStars();
+      }
+    }
+  }
 
   /* ---------- drawing ---------- */
   function star(cx, cy, r, color, t, phase) {
@@ -174,44 +180,34 @@
     ctx.restore();
   }
   function draw(t) {
-    ctx.clearRect(0, 0, canvas.width / dpr, canvas.height / dpr);
+    ctx.clearRect(0, 0, W, H);
     if (!on || !usable) return;
-    for (const p of prizes) star(p.x * CELL + CELL / 2, p.y * CELL + CELL / 2, CELL * 0.4, p.color, t, p.phase);
-    const n = snake.length;
+    for (const s of stars) star(s.x, s.y, 10, s.color, t, s.phase);
+    const n = pts.length;
     if (!n) return;
-    if (rpos.length !== n) syncR();
-    // Glide: each drawn segment eases toward its cell instead of jumping.
-    const dt = Math.min(t - lastDraw || 16, 100); lastDraw = t;
-    const ease = 1 - Math.exp(-dt / 75);
-    for (let i = 0; i < n; i++) {
-      const tg = center(snake[i]), p = rpos[i], dx = tg.x - p.x, dy = tg.y - p.y;
-      if (Math.abs(dx) > CELL * 1.6 || Math.abs(dy) > CELL * 1.6) { p.x = tg.x; p.y = tg.y; }   // wrapped past an edge: snap
-      else { p.x += dx * ease; p.y += dy * ease; }
-    }
-    for (let i = n - 1; i >= 0; i--) {
-      const p = rpos[i], k = 1 - i / n;
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, CELL * (0.3 + 0.22 * k), 0, 6.2832);
+    for (let i = n - 1; i >= 1; i--) {
+      const k = 1 - i / n;
+      ctx.beginPath(); ctx.arc(pts[i].x, pts[i].y, 6.5 + 5.5 * k, 0, TAU);
       ctx.fillStyle = `rgba(${SNAKE[0]},${SNAKE[1]},${SNAKE[2]},${(0.22 + 0.4 * k).toFixed(3)})`;
       ctx.fill();
     }
-    const hx = rpos[0].x, hy = rpos[0].y;
     const pop = Math.max(0, 1 - (t - flash) / 450);
-    ctx.beginPath(); ctx.arc(hx, hy, CELL * (0.5 + 0.22 * pop), 0, 6.2832);
+    ctx.beginPath(); ctx.arc(hx, hy, 12 + 5 * pop, 0, TAU);
     ctx.fillStyle = `rgba(${SNAKE[0]},${SNAKE[1]},${SNAKE[2]},0.7)`; ctx.shadowColor = `rgb(${SNAKE[0]},${SNAKE[1]},${SNAKE[2]})`; ctx.shadowBlur = 14; ctx.fill();
     ctx.shadowBlur = 0; ctx.fillStyle = 'rgba(10,20,18,.85)';
-    const px = -dir.y * CELL * 0.16, py = dir.x * CELL * 0.16, fx = dir.x * CELL * 0.14, fy = dir.y * CELL * 0.14;
-    for (const sgn of [-1, 1]) { ctx.beginPath(); ctx.arc(hx + fx + sgn * px, hy + fy + sgn * py, CELL * 0.07, 0, 6.2832); ctx.fill(); }
+    const c = Math.cos(theta), s = Math.sin(theta);
+    for (const sg of [-1, 1]) { ctx.beginPath(); ctx.arc(hx + c * 4 - s * 4 * sg, hy + s * 4 + c * 4 * sg, 1.8, 0, TAU); ctx.fill(); }
   }
-  let lastMeasure = 0;
   function frame(now) {
     raf = requestAnimationFrame(frame);
     if (now - lastMeasure > 500) { lastMeasure = now; measure(); }   // pick up layout changes and the email menu
-    if (moving && !paused()) {
-      acc += Math.min(now - last, 250);
-      while (acc >= TICK) { tick(); acc -= TICK; }
-    } else acc = 0;
-    last = now;
+    const dt = Math.min((now - last) / 1000, 0.05); last = now;
+    if (!paused()) update(dt);
+    pts = sample();
+    // Running into itself only trims the tail.
+    for (let i = 7; i < pts.length; i++) {
+      if (Math.hypot(pts[i].x - hx, pts[i].y - hy) < 8) { len = target = i * SPACING; pts.length = i; break; }
+    }
     draw(now);
   }
 
@@ -225,20 +221,19 @@
     cancelAnimationFrame(raf);
     if (v) {
       measure();
-      if (!snake.length) restart();
-      last = performance.now(); acc = 0;
-      raf = requestAnimationFrame(frame);
+      if (!path.length) restart();
+      last = performance.now(); raf = requestAnimationFrame(frame);
     } else {
-      ctx.clearRect(0, 0, canvas.width / dpr, canvas.height / dpr);
+      ctx.clearRect(0, 0, W, H);
     }
   }
   if (toggle) toggle.addEventListener('click', () => setOn(!on, true));
 
   /* ---------- arrow keys ---------- */
-  const DIRS = { ArrowUp: { x: 0, y: -1 }, ArrowDown: { x: 0, y: 1 }, ArrowLeft: { x: -1, y: 0 }, ArrowRight: { x: 1, y: 0 } };
+  const ANGLE = { ArrowRight: 0, ArrowDown: Math.PI / 2, ArrowLeft: Math.PI, ArrowUp: -Math.PI / 2 };
   document.addEventListener('keydown', e => {
-    const d = DIRS[e.key];
-    if (!d || !on || !usable || e.altKey || e.ctrlKey || e.metaKey) return;
+    const a = ANGLE[e.key];
+    if (a === undefined || !on || !usable || e.altKey || e.ctrlKey || e.metaKey) return;
     // Leave the arrow keys alone inside dialogs, the email menu and text fields.
     if (document.querySelector('dialog[open]')) return;
     const mm = document.getElementById('mail-menu');
@@ -247,10 +242,10 @@
     if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))) return;
     e.preventDefault();
     if (e.repeat) return;
-    const base = queued || dir;
-    if (moving && d.x === -base.x && d.y === -base.y) return;       // no instant U-turn
-    if (!moving) { moving = true; queued = d; acc = TICK; last = performance.now(); return; }   // first press sets it off
-    if (!queued) queued = d; else queue2 = d;                        // remember a second quick press
+    if (!ahead(a, LOOK * 2)) return;                                 // never turn toward text
+    if (!moving) { moving = true; theta = want = a; return; }        // the first press sets it off
+    if (Math.abs(angDiff(a, want)) > Math.PI - 0.2) return;          // no instant U-turn
+    want = a;
   });
 
   /* ---------- boot ---------- */
