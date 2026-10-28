@@ -23,6 +23,7 @@
   const counter = document.getElementById('star-count');
   const num = document.getElementById('star-num');
   const pauseBtn = document.getElementById('snake-pause');
+  const pauseWrap = document.getElementById('snake-pause-wrap');
   if (!canvas || !canvas.getContext) return;
   const ctx = canvas.getContext('2d');
   const reducedMq = matchMedia('(prefers-reduced-motion: reduce)');
@@ -48,6 +49,7 @@
   let len = 0, target = 0, path = [], pts = [];
   let stars = [], eaten = 0, flash = 0;
   let raf = 0, on = false, last = 0, lastMeasure = 0;
+  let bandY = 0;                 // stars stay below the header and intro
   let userPaused = false, evading = false, speedK = 1, inside = 0;
 
   const rnd = (a, b) => a + Math.random() * (b - a);
@@ -90,12 +92,14 @@
     textRects = rects;
     const d = document.getElementById('device');
     dev = d ? box(d, 8) : null;
+    const intro = document.querySelector('.intro');
+    bandY = intro ? intro.getBoundingClientRect().bottom + 16 : 0;
     // Is there any real room? On a phone the content can fill the whole screen.
     let free = 0, total = 0;
     for (let y = 12; y < H; y += 24) for (let x = 12; x < W; x += 24) { total++; if (!inText(x, y)) free++; }
     usable = free >= 40;
     canvas.style.visibility = usable ? '' : 'hidden';
-    stars = stars.filter(s => !inText(s.x, s.y) && !(dev && inRect(s.x, s.y, dev)));
+    stars = stars.filter(s => s.y > bandY && !inText(s.x, s.y) && !(dev && inRect(s.x, s.y, dev)));
     fillStars();
   }
 
@@ -113,15 +117,15 @@
   /* ---------- prizes ---------- */
   function spawnStar() {
     for (let tries = 0; tries < 200; tries++) {
-      const x = rnd(24, W - 24), y = rnd(24, H - 24);
-      if (inText(x, y) || (dev && inRect(x, y, dev)) || stars.some(s => Math.hypot(s.x - x, s.y - y) < 70)) continue;
+      const x = rnd(24, W - 24), y = rnd(Math.max(24, bandY), H - 24);
+      if (inText(x, y) || (dev && inRect(x, y, dev)) || stars.some(s => Math.hypot(s.x - x, s.y - y) < 130)) continue;
       return { x, y, color: PRIZES[Math.floor(Math.random() * PRIZES.length)], phase: Math.random() * 6.28 };
     }
     return null;
   }
   function fillStars() {
     if (!usable) return;
-    const want = Math.min(12, Math.max(3, Math.floor(W * H / 90000)));
+    const want = Math.min(8, Math.max(3, Math.floor(W * H / 140000)));
     while (stars.length < want) { const s = spawnStar(); if (!s) break; stars.push(s); }
   }
 
@@ -240,6 +244,7 @@
     on = v;
     canvas.hidden = !v;
     if (counter) counter.hidden = !v;
+    if (pauseWrap) pauseWrap.hidden = !v;
     if (toggle) { toggle.setAttribute('aria-pressed', String(v)); toggle.textContent = v ? 'Snake: on (use arrow keys)' : 'Snake: off'; }
     if (save) remember(v ? 'on' : 'off');
     cancelAnimationFrame(raf);
@@ -260,6 +265,7 @@
       pauseBtn.setAttribute('aria-pressed', String(p));
       pauseBtn.setAttribute('aria-label', p ? 'Resume the snake' : 'Pause the snake');
       pauseBtn.title = p ? 'Play (P)' : 'Pause (P)';
+      pauseBtn.textContent = p ? 'Play' : 'Pause';
     }
   }
   if (pauseBtn) pauseBtn.addEventListener('click', () => setPaused(!userPaused));
