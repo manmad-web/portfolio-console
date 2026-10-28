@@ -240,3 +240,18 @@ footer a:hover { color: var(--cream); }
 .shot a { display: block; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: #0d0d10; }
 .shot a:hover { border-color: var(--cream); }
 .shot img { display: block; width: 100%; height: auto; max-width: 100%; }
+
+/* ---------- Laptop fit: header, intro and console share one screen ---------- */
+header.top { padding-block: 12px; }
+.intro { padding-block: 6px 4px; gap: 8px; }
+.intro h1 { font-size: clamp(32px, 4.6vw, 52px); }
+.intro p { font-size: clamp(15px, 1.4vw, 17px); }
+.device {
+  /* never taller than what is left of the screen below the intro */
+  max-width: min(1120px, max(520px, calc((100svh - 215px) * 1.5)));
+  margin-top: -3.5%;
+  margin-bottom: -5%;
+}
+.contact { padding-block: 120px 72px; }
+
+@media (max-width: 520px) { .hdr-right { gap: 6px; } .icon-btn { width: 34px; height: 34px; } .talk { padding: 8px 12px; } }
